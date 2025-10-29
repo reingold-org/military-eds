@@ -5,6 +5,7 @@ header .nav-wrapper {
   width: 100%;
   z-index: 2;
   position: fixed;
+  padding-top: 60px;
 }
 
 header nav {
@@ -69,7 +70,6 @@ header nav .nav-hamburger button {
   border: 0;
   border-radius: 0;
   padding: 0;
-  background-color: var(--background-color);
   color: inherit;
   overflow: initial;
   text-overflow: initial;
@@ -146,7 +146,7 @@ header .nav-brand {
 }
 
 header nav .nav-brand img {
-  width: 250px;
+  width: 350px;
   height: auto;
 }
 
@@ -231,6 +231,7 @@ header nav .nav-sections ul > li > ul > li {
   header nav .nav-sections .default-content-wrapper > ul > li {
     flex: 0 1 auto;
     position: relative;
+    font-size: 20px;
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li > ul {
