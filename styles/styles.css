@@ -18,6 +18,7 @@
   --text-color: #131313;
   --link-color: #355e93;
   --link-hover-color: #355e93;
+  --accent-color: #355e93;
 
   /* fonts */
   --body-font-family: roboto, roboto-fallback, sans-serif;
@@ -257,7 +258,7 @@ main .section.highlight {
 }
 
 h2:after {
-    background-color: var(--accent-color,#757575);
+    background-color: var(--accent-color);
     content: "";
     display: block;
     height: 4px;
