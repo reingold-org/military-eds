@@ -13,15 +13,19 @@
 :root {
   /* colors */
   --background-color: white;
-  --light-color: #f8f8f8;
+  --light-color: #c7c7c7;
   --dark-color: #505050;
   --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
+  --link-color: #355e93;
+  --link-hover-color: #355e93;
+  --accent-color: #355e93;
 
-  /* fonts */
+  /* fonts 
   --body-font-family: roboto, roboto-fallback, sans-serif;
   --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
+*/
+   --body-font-family: "neue-haas-grotesk-display", sans-serif;
+  --heading-font-family: "neue-haas-grotesk-display", sans-serif;
 
   /* body sizes */
   --body-font-size-m: 22px;
@@ -226,6 +230,9 @@ main img {
   height: 100%;
   width: 100%;
 }
+.icon-search img{
+  filter: invert(1);
+}
 
 /* sections */
 main > .section {
@@ -233,7 +240,7 @@ main > .section {
 }
 
 main > .section > div {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: auto;
   padding: 0 24px;
 }
@@ -254,4 +261,14 @@ main .section.highlight {
   background-color: var(--light-color);
   margin: 0;
   padding: 40px 0;
+}
+
+h2:after {
+    background-color: var(--accent-color);
+    content: "";
+    display: block;
+    height: 4px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    width: 5pc
 }

@@ -1,6 +1,7 @@
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+  background-color: var(--background-dark,#202020);
+  color: var(--color-foreground-dark,#fff);
+  padding: .5em 1em
 }
 
 footer .footer > div {
@@ -11,6 +12,10 @@ footer .footer > div {
 
 footer .footer p {
   margin: 0;
+}
+
+footer .footer a {
+  color: var(--color-foreground-dark,#fff);
 }
 
 @media (width >= 900px) {
