@@ -24,7 +24,7 @@
   --body-font-family: roboto, roboto-fallback, sans-serif;
   --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
 */
-   --body-font-family: "neue-haas-grotesk-display", sans-serif;
+   --body-font-family: "neue-haas-grotesk-text", sans-serif;
   --heading-font-family: "neue-haas-grotesk-display", sans-serif;
 
   /* body sizes */
@@ -114,6 +114,16 @@ h6 {
   font-weight: 600;
   line-height: 1.25;
   scroll-margin: 40px;
+
+  &::after {
+    background-color: var(--accent-color);
+    content: "";
+    display: block;
+    height: 4px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    width: 5pc;
+}
 }
 
 h1 { font-size: var(--heading-font-size-xxl); }
@@ -263,12 +273,3 @@ main .section.highlight {
   padding: 40px 0;
 }
 
-h2:after {
-    background-color: var(--accent-color);
-    content: "";
-    display: block;
-    height: 4px;
-    margin-bottom: 10px;
-    margin-top: 10px;
-    width: 5pc
-}
