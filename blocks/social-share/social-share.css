@@ -1,0 +1,67 @@
+.social-share ul {
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.social-share ul,.social-share ul li {
+    display: flex;
+}
+
+.social-share ul li {
+    align-items: center;
+    border-radius: 50%;
+    color: transparent;
+    cursor: pointer;
+    font-size: .85rem;
+    font-weight: 700;
+    height: 40px;
+    justify-content: center;
+    width: 40px;
+}
+
+.social-share ul li::before {
+    background-color: #fff;
+    content: "f";
+    display: block;
+    font-family: Arial,sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    height: 20px;
+    mask-size: cover;
+    position: absolute;
+    width: 20px
+}
+
+.social-share ul li.facebook {
+    background-color: #3b5998
+}
+
+.social-share ul li.facebook::before {
+    mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20640%22%3E%3Cpath%20d%3D%22M240%20363.3L240%20576L356%20576L356%20363.3L442.5%20363.3L460.5%20265.5L356%20265.5L356%20230.9C356%20179.2%20376.3%20159.4%20428.7%20159.4C445%20159.4%20458.1%20159.8%20465.7%20160.6L465.7%2071.9C451.4%2068%20416.4%2064%20396.2%2064C289.3%2064%20240%20114.5%20240%20223.4L240%20265.5L174%20265.5L174%20363.3L240%20363.3z%22%2F%3E%3C%2Fsvg%3E")
+}
+
+.social-share ul li.x {
+    background-color: #000
+}
+
+.social-share ul li.x::before {
+    mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20640%22%3E%3Cpath%20d%3D%22M453.2%20112L523.8%20112L369.6%20288.2L551%20528L409%20528L297.7%20382.6L170.5%20528L99.8%20528L264.7%20339.5L90.8%20112L236.4%20112L336.9%20244.9L453.2%20112zM428.4%20485.8L467.5%20485.8L215.1%20152L173.1%20152L428.4%20485.8z%22%2F%3E%3C%2Fsvg%3E")
+}
+
+.social-share ul li.linkedin {
+    background-color: #0077b5
+}
+
+.social-share ul li.linkedin::before {
+    mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20640%22%3E%3Cpath%20d%3D%22M196.3%20512L103.4%20512L103.4%20212.9L196.3%20212.9L196.3%20512zM149.8%20172.1C120.1%20172.1%2096%20147.5%2096%20117.8C96%20103.5%20101.7%2089.9%20111.8%2079.8C121.9%2069.7%20135.6%2064%20149.8%2064C164%2064%20177.7%2069.7%20187.8%2079.8C197.9%2089.9%20203.6%20103.6%20203.6%20117.8C203.6%20147.5%20179.5%20172.1%20149.8%20172.1zM543.9%20512L451.2%20512L451.2%20366.4C451.2%20331.7%20450.5%20287.2%20402.9%20287.2C354.6%20287.2%20347.2%20324.9%20347.2%20363.9L347.2%20512L254.4%20512L254.4%20212.9L343.5%20212.9L343.5%20253.7L344.8%20253.7C357.2%20230.2%20387.5%20205.4%20432.7%20205.4C526.7%20205.4%20544%20267.3%20544%20347.7L544%20512L543.9%20512z%22%2F%3E%3C%2Fsvg%3E")
+}
+
+.social-share ul li.email {
+    background-color: #d44638
+}
+
+.social-share ul li.email::before {
+    mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20640%22%3E%3Cpath%20d%3D%22M568.4%2037.7C578.2%2034.2%20589%2036.7%20596.4%2044C603.8%2051.3%20606.2%2062.2%20602.7%2072L424.7%20568.9C419.7%20582.8%20406.6%20592%20391.9%20592C377.7%20592%20364.9%20583.4%20359.6%20570.3L295.4%20412.3C290.9%20401.3%20292.9%20388.7%20300.6%20379.7L395.1%20267.3C400.2%20261.2%20399.8%20252.3%20394.2%20246.7C388.6%20241.1%20379.6%20240.7%20373.6%20245.8L261.2%20340.1C252.1%20347.7%20239.6%20349.7%20228.6%20345.3L70.1%20280.8C57%20275.5%2048.4%20262.7%2048.4%20248.5C48.4%20233.8%2057.6%20220.7%2071.5%20215.7L568.4%2037.7z%22%2F%3E%3C%2Fsvg%3E")
+}

@@ -1,17 +1,20 @@
 import {
   buildBlock,
+  getMetadata,
   loadHeader,
   loadFooter,
   decorateButtons,
   decorateIcons,
   decorateSections,
   decorateBlocks,
-  decorateTemplateAndTheme,
   waitForFirstImage,
   loadSection,
   loadSections,
   loadCSS,
+  toClassName,
 } from './aem.js';
+
+import decorateArticle from '../templates/article/article.js';
 
 /**
  * Builds hero block and prepends to main in a new section.
@@ -25,6 +28,26 @@ function buildHeroBlock(main) {
     const section = document.createElement('div');
     section.append(buildBlock('hero', { elems: [picture, h1] }));
     main.prepend(section);
+  }
+}
+
+/**
+ * Set template (page structure) and theme (page styles).
+ */
+function decorateTemplateAndTheme() {
+  const addClasses = (element, classes) => {
+    classes.split(',').forEach((c) => {
+      element.classList.add(toClassName(c.trim()));
+    });
+  };
+  const template = getMetadata('template');
+  if (template) addClasses(document.body, template);
+  const theme = getMetadata('theme');
+  if (theme) addClasses(document.body, theme);
+  if (template === 'article') {
+    const main = document.querySelector('main');
+    decorateArticle(main);
+    loadCSS(`${window.hlx.codeBasePath}/templates/article/article.css`);
   }
 }
 

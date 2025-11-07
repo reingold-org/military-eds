@@ -1,9 +1,7 @@
 .hero-container .hero-wrapper {
   max-width: unset;
   padding: 0;
-  border-bottom-width: 60px;
-  border-bottom-style: solid;
-  border-bottom-color: var(--accent-color);
+  border-bottom: 60px solid var(--accent-color);
 }
 
 .hero {
