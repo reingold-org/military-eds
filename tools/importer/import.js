@@ -39,8 +39,8 @@ const createMetadataBlock = (main, document) => {
     meta.Description = desc.content;
   }
 
-  // find the <meta property="og:image"> element
-  const img = document.querySelector('img.cf-feature-image');
+  // find the img element
+  const img = document.querySelector('.cf-feature-image').cloneNode(true);
   if (img) {
     meta.Image = img;
   }
