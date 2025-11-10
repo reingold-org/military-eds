@@ -87,49 +87,53 @@ function renderGrid(items) {
   });
 }
 
-async function onSelect(item) {
+function onSelect(item) {
   console.log('[CLICK]', item.id, 'document.hasFocus=', document.hasFocus());
-  window.focus(); // try to force focus
+  window.focus();
   console.log('[AFTER window.focus] document.hasFocus=', document.hasFocus());
 
   setStatus('Fetching full asset…');
-  try {
-    const assetUrl = `${API_BASE_ASSET}?id=${encodeURIComponent(item.id)}&api_key=${API_KEY}`;
-    console.log('[ASSET URL]', assetUrl);
-    const res = await fetch(assetUrl, { headers: { Accept: 'application/json' } });
-    if (!res.ok) throw new Error(`Asset API failed: ${res.status}`);
-    const data = await res.json();
-    console.log('[ASSET DATA]', data);
-    const fullImageUrl = data.results?.image;
-    if (!fullImageUrl) throw new Error('No full image URL found');
 
-    // Load image
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = fullImageUrl;
-    await img.decode();
-    console.log('[IMAGE LOADED]', fullImageUrl, img.naturalWidth, img.naturalHeight);
+  (async () => {
+    try {
+      const assetUrl = `${API_BASE_ASSET}?id=${encodeURIComponent(item.id)}&api_key=${API_KEY}`;
+      console.log('[ASSET URL]', assetUrl);
+      const res = await fetch(assetUrl, { headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error(`Asset API failed: ${res.status}`);
+      const data = await res.json();
+      console.log('[ASSET DATA]', data);
+      const fullImageUrl = data.results?.image;
+      if (!fullImageUrl) throw new Error('No full image URL found');
 
-    // Draw into canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = fullImageUrl;
+      await img.decode();
+      console.log('[IMAGE LOADED]', fullImageUrl, img.naturalWidth, img.naturalHeight);
 
-    // Convert to blob
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    console.log('[BLOB CREATED]', blob);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
 
-    // Clipboard write
-    console.log('[BEFORE CLIPBOARD WRITE] document.hasFocus=', document.hasFocus());
-    await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-    console.log('[CLIPBOARD WRITE SUCCESS]');
-    setStatus('✅ Image copied to clipboard');
-  } catch (err) {
-    console.error('[COPY ERROR]', err);
-    setStatus(`❌ Copy failed: ${err.message}`);
-  }
+      // Use toBlob callback to stay inside gesture context
+      canvas.toBlob(async (blob) => {
+        console.log('[BLOB CREATED]', blob, 'document.hasFocus=', document.hasFocus());
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+          console.log('[CLIPBOARD WRITE SUCCESS]');
+          setStatus('✅ Image copied to clipboard');
+        } catch (err) {
+          console.error('[CLIPBOARD WRITE ERROR]', err);
+          setStatus(`❌ Copy failed: ${err.message}`);
+        }
+      }, 'image/png');
+    } catch (err) {
+      console.error('[COPY ERROR]', err);
+      setStatus(`❌ Copy failed: ${err.message}`);
+    }
+  })();
 }
 
 // Wire UI
