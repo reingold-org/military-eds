@@ -110,7 +110,7 @@ async function onSelect(item) {
     ctx.drawImage(img, 0, 0);
 
     // Step 4: Convert to blob
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpg'));
 
     // Step 5: Copy blob to clipboard
     await navigator.clipboard.write([
