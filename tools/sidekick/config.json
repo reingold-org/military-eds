@@ -1,0 +1,14 @@
+{
+  "project": "Military",
+  "plugins": [
+    {
+      "id": "dvids-search",
+      "title": "DVIDS Images",
+      "url": "/tools/sidekick/dvids/dvids-popover.html",
+      "isPopover": true,
+      "popoverRect": "width:640px;height:520px;",
+      "environments": ["edit"],
+      "pinned": true
+    }
+  ]
+}
