@@ -97,28 +97,35 @@ function renderGrid(items) {
  * 2) If you require the true original, fetch item.url page and resolve its download image href.
  */
 async function onSelect(item) {
-  setStatus('Fetching image…');
-
+  setStatus('Fetching full asset…');
   try {
-    // Attempt large derivative (fast, robust, no page scraping)
-    const largeUrl = await resolveLargeThumbnail(item);
-    const blob = await fetchImageBlob(largeUrl);
+    // Step 1: Query Asset API with the image ID
+    const assetUrl = `https://api.dvidshub.net/asset?id=${encodeURIComponent(item.id)}&api_key=${API_KEY}`;
+    const res = await fetch(assetUrl, { headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error(`Asset API failed: ${res.status}`);
+    const data = await res.json();
 
-    await copyImageToClipboard(blob);
-    setStatus('Copied image to clipboard.');
-  } catch (e1) {
-    console.warn('Large derivative failed, attempting original resolution via page:', e1);
-    try {
-      const originalUrl = await resolveOriginalFromPage(item.url);
-      const blob = await fetchImageBlob(originalUrl);
-      await copyImageToClipboard(blob);
-      setStatus('Copied original image to clipboard.');
-    } catch (e2) {
-      console.error(e2);
-      setStatus('Failed to copy. Check API key/domain and try again.');
-    }
+    // Step 2: Extract full image URL from asset response
+    const fullImageUrl = data.results?.image;
+    if (!fullImageUrl) throw new Error('No full image URL found in asset response');
+
+    // Step 3: Fetch the binary image
+    const imgRes = await fetch(fullImageUrl);
+    if (!imgRes.ok) throw new Error(`Image fetch failed: ${imgRes.status}`);
+    const blob = await imgRes.blob();
+
+    // Step 4: Copy binary image to clipboard
+    await navigator.clipboard.write([
+      new ClipboardItem({ [blob.type]: blob })
+    ]);
+
+    setStatus('✅ Full image copied to clipboard');
+  } catch (err) {
+    console.error(err);
+    setStatus(`❌ Copy failed: ${err.message}`);
   }
 }
+
 
 async function resolveLargeThumbnail(item) {
   // Use the Search API again, requesting a "near-original" thumb by width.
