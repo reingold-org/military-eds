@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tags Palette</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    .tag-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+    .tag-item {
+      display: block;
+      margin: 5px 0;
+    }
+    button {
+      margin-top: 15px;
+      padding: 8px 12px;
+      background: #0078d4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #005a9e;
+    }
+  </style>
+</head>
+<body>
+  <h2>Select Topics</h2>
+  <div id="tag-list" class="tag-list"></div>
+  <button id="copy-btn">Copy Selected</button>
+
+  <script src="tags.js"></script>
+</body>
+</html>
