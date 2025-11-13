@@ -114,13 +114,6 @@ function onSelect(item, card) {
       const fullImageUrl = data.results?.image;
       if (!fullImageUrl) throw new Error('No full image URL found');
 
-      // Store asset data for paste detection
-      sessionStorage.setItem('dvids_last_copied', JSON.stringify({
-        id: item.id,
-        assetData: data.results,
-        timestamp: Date.now()
-      }));
-
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.src = fullImageUrl;
@@ -181,6 +174,8 @@ function onSelect(item, card) {
         const sizeMsg = img.naturalWidth !== targetWidth ? ` (resized from ${img.naturalWidth}x${img.naturalHeight})` : '';
         setStatus(`✅ Image copied: ${targetWidth}x${targetHeight}, ${finalSizeMB} MB${sizeMsg}`);
         showCopiedOverlay(card);
+        // Show alt text dialog
+        showAltTextDialog(item.id, data.results);
       } catch (err) {
         console.error('[CLIPBOARD WRITE ERROR]', err);
         setStatus(`❌ Copy failed: ${err.message}`);
@@ -198,31 +193,7 @@ els.next.addEventListener('click', () => search(page + 1));
 els.prev.addEventListener('click', () => search(Math.max(1, page - 1)));
 els.q.addEventListener('keydown', (e) => { if (e.key === 'Enter') search(1); });
 
-// Detect paste events with images and show alt text dialog
-document.addEventListener('paste', async (e) => {
-  const items = e.clipboardData?.items || [];
-  const imageItem = Array.from(items).find(item => item.type.startsWith('image/'));
-  
-  if (imageItem) {
-    console.log('[PASTED IMAGE]', imageItem.type);
-    
-    // Check if we have a recently copied DVIDS asset
-    const lastCopied = sessionStorage.getItem('dvids_last_copied');
-    if (lastCopied) {
-      try {
-        const { id, assetData, timestamp } = JSON.parse(lastCopied);
-        // Only show dialog if copied within last 10 minutes
-        if (Date.now() - timestamp < 10 * 60 * 1000) {
-          await showAltTextDialog(id, assetData);
-        }
-      } catch (err) {
-        console.error('[PASTE ERROR]', err);
-      }
-    }
-  }
-});
-
-async function showAltTextDialog(assetId, assetData) {
+function showAltTextDialog(assetId, assetData) {
   // Extract alt text from asset data (check multiple possible fields)
   const altText = assetData?.description || 
                   assetData?.caption || 
