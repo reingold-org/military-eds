@@ -122,7 +122,7 @@ function onSelect(item, card) {
 
       // Calculate target dimensions to stay under clipboard size limits
       // Clipboard typically supports ~2-4 MB for PNG
-      const MAX_BLOB_SIZE = 2.5 * 1024 * 1024; // 2.5 MB to be safe
+      const MAX_BLOB_SIZE = 4 * 1024 * 1024; // 4 MB to be safe
       let targetWidth = img.naturalWidth;
       let targetHeight = img.naturalHeight;
       let attempt = 0;
@@ -150,7 +150,7 @@ function onSelect(item, card) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
-        blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpg'));
         const sizeMB = blob.size / 1024 / 1024;
         console.log(`[BLOB SIZE]`, `${sizeMB.toFixed(2)} MB`);
         
@@ -243,8 +243,23 @@ function showAltTextDialog(assetId, assetData) {
       copyBtn.disabled = true;
       console.log('[ALT TEXT COPIED]', altText.substring(0, 100));
       setStatus('✅ Alt text copied to clipboard');
-      // Close the entire DVIDS popover after a brief moment
+      
+      // Close modal, reset search, and close palette
       setTimeout(() => {
+        // Close the modal overlay
+        closeDialog();
+        
+        // Reset the search form
+        els.q.value = '';
+        els.aspect.value = '';
+        els.branch.value = '';
+        els.sort.value = 'date';
+        els.sortdir.value = 'desc';
+        els.grid.innerHTML = '';
+        page = 1;
+        setStatus('Idle');
+        
+        // Close the entire DVIDS palette
         chrome.runtime.sendMessage('igkmdomcgoebiipaifhmpfjhbjccggml', {
           id: 'dvids-search',
           action: 'closePalette',
