@@ -169,7 +169,7 @@ function onSelect(item, card) {
       console.log('[FINAL]', `${targetWidth}x${targetHeight}, ${finalSizeMB} MB`);
 
       try {
-        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        await navigator.clipboard.write([new ClipboardItem({ 'image/jpg': blob })]);
         console.log('[CLIPBOARD WRITE SUCCESS]', `${finalSizeMB} MB written`);
         const sizeMsg = img.naturalWidth !== targetWidth ? ` (resized from ${img.naturalWidth}x${img.naturalHeight})` : '';
         setStatus(`✅ Image copied: ${targetWidth}x${targetHeight}, ${finalSizeMB} MB${sizeMsg}`);
