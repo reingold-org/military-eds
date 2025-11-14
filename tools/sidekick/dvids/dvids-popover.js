@@ -150,7 +150,7 @@ function onSelect(item, card) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
-        blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpg'));
+        blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         const sizeMB = blob.size / 1024 / 1024;
         console.log(`[BLOB SIZE]`, `${sizeMB.toFixed(2)} MB`);
         
@@ -169,7 +169,7 @@ function onSelect(item, card) {
       console.log('[FINAL]', `${targetWidth}x${targetHeight}, ${finalSizeMB} MB`);
 
       try {
-        await navigator.clipboard.write([new ClipboardItem({ 'image/jpg': blob })]);
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
         console.log('[CLIPBOARD WRITE SUCCESS]', `${finalSizeMB} MB written`);
         const sizeMsg = img.naturalWidth !== targetWidth ? ` (resized from ${img.naturalWidth}x${img.naturalHeight})` : '';
         setStatus(`✅ Image copied: ${targetWidth}x${targetHeight}, ${finalSizeMB} MB${sizeMsg}`);
