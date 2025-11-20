@@ -1,25 +1,137 @@
 footer {
-  background-color: var(--background-dark,#202020);
-  color: var(--color-foreground-dark,#fff);
-  padding: .5em 1em
+  background-color: var(--background-dark, #202020);
+  color: var(--color-foreground-dark, #fff);
 }
 
-footer .footer > div {
-  margin: auto;
+footer .footer {
   max-width: 1200px;
-  padding: 40px 24px 24px;
+  margin: 0 auto;
 }
 
 footer .footer p {
-  margin: 0;
+  margin: 0 0 16px;
 }
 
 footer .footer a {
-  color: var(--color-foreground-dark,#fff);
+  color: var(--color-foreground-dark, #fff);
+  text-decoration: none;
+}
+
+/* Brand and Links Container */
+footer .footer-brand,
+footer .footer-links {
+  padding: 40px 24px;
+}
+
+/* Brand Section */
+footer .footer-brand {
+  border-bottom: 1px solid rgb(255 255 255 / 20%);
+}
+
+footer .footer-brand img {
+  max-width: 200px;
+  height: auto;
+}
+
+/* Links Section */
+footer .footer-links {
+  border-bottom: 1px solid rgb(255 255 255 / 20%);
+}
+
+footer .footer-links > div {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+footer .footer-links p {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+footer .footer-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+footer .footer-links li {
+  margin: 0 0 12px;
+}
+
+footer .footer-links a {
+  font-size: 14px;
+}
+
+footer .footer a:hover {
+  text-decoration: underline;
+}
+
+/* Subfooter Section */
+footer .footer-subfooter {
+  padding: 24px;
+  font-size: 14px;
+}
+
+footer .footer-subfooter p {
+  opacity: 0.8;
+  margin: 0;
 }
 
 @media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
+  /* Two column layout: brand 30%, links 70% */
+  footer .footer {
+    width: 1200px;
+    display: grid;
+    grid-template-columns: 30% 70%;
+    grid-template-rows: auto auto;
+  }
+
+  footer .footer-brand {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 40px 32px 40px 0;
+    border-bottom: none;
+  }
+
+  footer .footer-links {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 40px 0 40px 32px;
+    border-bottom: none;
+  }
+
+  /* Links section: 3 columns */
+  footer .footer-links > div {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+
+  /* Subfooter spans full width */
+  footer .footer-subfooter {
+    padding: 24px 0;
+    border-top: 1px solid rgb(255 255 255 / 20%);
+
+    ul {
+      width: 1200px;
+      display: flex;
+      justify-content: start;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      gap: 0;
+
+      li {
+        margin-right: 24px;
+        padding: 0;
+
+        &:last-child {
+          margin-right: 0;
+          flex: 50%;
+          text-align: right;
+        }
+      }
+    }
   }
 }
