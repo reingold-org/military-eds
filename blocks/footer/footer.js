@@ -14,7 +14,28 @@ export default async function decorate(block) {
   // decorate footer DOM
   block.textContent = '';
   const footer = document.createElement('div');
+  footer.className = 'footer';
   while (fragment.firstElementChild) footer.append(fragment.firstElementChild);
+
+  // Apply classes to the three sections: brand, links, subfooter
+  const classes = ['brand', 'links', 'subfooter'];
+  classes.forEach((c, i) => {
+    const section = footer.children[i];
+    if (section) section.classList.add(`footer-${c}`);
+  });
+
+  // Make brand logo link to home
+  const footerBrand = footer.querySelector('.footer-brand');
+  if (footerBrand) {
+    const brandImg = footerBrand.querySelector('img');
+    if (brandImg && !brandImg.closest('a')) {
+      const link = document.createElement('a');
+      link.href = '/';
+      link.setAttribute('aria-label', 'Home');
+      brandImg.parentNode.insertBefore(link, brandImg);
+      link.appendChild(brandImg);
+    }
+  }
 
   block.append(footer);
 }
