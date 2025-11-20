@@ -45,6 +45,48 @@
   --nav-height: 164px;
 }
 
+/* themes */
+body.army {
+  --accent-color: #fc0;
+  --link-color: #1c2226;
+}
+
+body.navy {
+  --accent-color: #00283C;
+  --link-color: #1a5eab;
+  --background-dark: #00283C;
+}
+
+body.airforce {
+  --accent-color: #1c2347;
+  --link-color: #1a5eab;
+  --background-dark: #1c2347;
+}
+
+body.marines {
+  --accent-color: #e41b17;
+  --link-color: #a71930;
+  --background-dark: #171717;
+}
+
+body.coastguard {
+  --accent-color: #007dc3;
+  --link-color: #005f86;
+  --background-dark: #013043;
+}
+
+body.spaceforce {
+  --accent-color: #000;
+  --link-color: #1a5eab;
+  --background-dark: #000;
+}
+
+body.dod {
+  --accent-color: #355e93;
+  --link-color: #2020E0;
+  --background-dark: #1c1c1c;
+}
+
 /* fallback fonts */
 @font-face {
   font-family: roboto-condensed-fallback;

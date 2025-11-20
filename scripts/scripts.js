@@ -94,12 +94,23 @@ export function decorateMain(main) {
 }
 
 /**
+ * Updates the page title to include slug from metadata
+ */
+function updatePageTitle() {
+  const slug = getMetadata('slug');
+  if (slug && document.title) {
+    document.title = `${document.title} | ${slug}`;
+  }
+}
+
+/**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
+  updatePageTitle();
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
