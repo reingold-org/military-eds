@@ -54,7 +54,7 @@ function decorateArticle(main) {
   const author = getMetadata('author') || 'Unknown Author';
   const publishDate = getMetadata('release-date') || '';
   byline.textContent = publishDate ? `By ${author} | ${publishDate}` : `By ${author}`;
-  
+
   // Insert after image if it exists, otherwise after h1
   if (image) {
     image.after(byline, primary.children[3]);
