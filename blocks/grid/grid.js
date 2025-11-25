@@ -1,9 +1,9 @@
 /**
  * Grid Block (USWDS)
- * 
+ *
  * Creates USWDS grid layouts from Edge Delivery content.
  * Follows Edge Delivery's block pattern.
- * 
+ *
  * Usage in content:
  * | Grid |
  * | --- |
@@ -14,25 +14,25 @@ export default function decorate(block) {
   // Wrap block content in grid-container
   const gridContainer = document.createElement('div');
   gridContainer.className = 'grid-container';
-  
+
   const gridRow = document.createElement('div');
   gridRow.className = 'grid-row grid-gap';
-  
+
   // Get column configuration from block metadata
   // Default to equal columns
   const rows = block.querySelectorAll(':scope > div');
-  
+
   rows.forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
     const colCount = cells.length;
-    
+
     // Calculate column width (12-column grid)
-    let colWidth = 12 / colCount;
-    
+    const colWidth = 12 / colCount;
+
     // Check for custom column widths in first cell
     const firstCellText = cells[0]?.textContent?.trim();
     const widthMatch = firstCellText?.match(/(\d+)-(\d+)/);
-    
+
     if (widthMatch) {
       // Custom widths specified (e.g., "8-4" for 8 and 4 column layout)
       cells.forEach((cell, index) => {
@@ -52,9 +52,8 @@ export default function decorate(block) {
       });
     }
   });
-  
+
   gridContainer.appendChild(gridRow);
   block.textContent = '';
   block.appendChild(gridContainer);
 }
-

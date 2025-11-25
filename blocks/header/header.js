@@ -122,7 +122,7 @@ async function buildBreadcrumbsFromNavTree(nav, currentUrl) {
 
   // Try to find exact match in navigation
   let menuItem = Array.from(nav.querySelectorAll('a')).find((a) => a.href === currentUrl);
-  
+
   if (menuItem) {
     // Found exact match - walk up the nav tree
     do {
@@ -133,38 +133,38 @@ async function buildBreadcrumbsFromNavTree(nav, currentUrl) {
   } else if (currentUrl !== homeUrl) {
     // No exact match - try to build breadcrumbs from URL path
     const currentPath = new URL(currentUrl).pathname;
-    const pathSegments = currentPath.split('/').filter(segment => segment);
-    
+    const pathSegments = currentPath.split('/').filter((segment) => segment);
+
     // For each path segment, try to find a matching nav item
     let builtPath = '';
     pathSegments.forEach((segment, index) => {
       builtPath += `/${segment}`;
       const isLastSegment = index === pathSegments.length - 1;
-      
+
       // Try to find this path in navigation
       const matchingLink = Array.from(nav.querySelectorAll('a')).find((a) => {
         const linkPath = new URL(a.href).pathname;
         return linkPath === builtPath || linkPath === `${builtPath}/`;
       });
-      
+
       if (matchingLink) {
         // Found in nav - use nav title
         const parentLi = matchingLink.closest('li');
         crumbs.push({
           title: getDirectTextContent(parentLi),
-          url: isLastSegment ? null : matchingLink.href
+          url: isLastSegment ? null : matchingLink.href,
         });
       } else if (isLastSegment) {
         // Last segment not in nav - use page metadata
         crumbs.push({
           title: getMetadata('og:title') || segment.replace(/-/g, ' '),
-          url: null
+          url: null,
         });
       } else {
         // Intermediate segment not in nav - use cleaned segment name
         crumbs.push({
           title: segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' '),
-          url: `${window.location.origin}${builtPath}`
+          url: `${window.location.origin}${builtPath}`,
         });
       }
     });

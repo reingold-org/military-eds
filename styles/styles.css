@@ -230,10 +230,13 @@ a:hover {
 }
 
 /* buttons - Using USWDS styles (imported above) */
+
 /* The USWDS .usa-button class provides the base button styling */
+
 /* EDS auto-applies .button class to links, so we map it to USWDS styles */
 
 /* Note: In your block JavaScript, add 'usa-button' class to buttons */
+
 /* Example: button.classList.add('usa-button'); */
 
 main img {

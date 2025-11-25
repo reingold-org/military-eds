@@ -1,9 +1,9 @@
 /**
  * Card Block (USWDS)
- * 
+ *
  * Creates USWDS card components from Edge Delivery content.
  * Follows Edge Delivery's block pattern.
- * 
+ *
  * Usage in content:
  * | Card |
  * | --- |
@@ -14,16 +14,16 @@
 
 export default function decorate(block) {
   const rows = block.querySelectorAll(':scope > div');
-  
+
   rows.forEach((row) => {
     const card = document.createElement('div');
     card.className = 'usa-card';
-    
+
     const cardContainer = document.createElement('div');
     cardContainer.className = 'usa-card__container';
-    
+
     const children = Array.from(row.children);
-    
+
     children.forEach((child, index) => {
       if (index === 0) {
         // First cell becomes card media (if it has an image)
@@ -61,9 +61,8 @@ export default function decorate(block) {
         cardContainer.appendChild(cardFooter);
       }
     });
-    
+
     card.appendChild(cardContainer);
     row.replaceWith(card);
   });
 }
-
