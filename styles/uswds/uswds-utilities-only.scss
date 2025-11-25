@@ -1,0 +1,21 @@
+/*
+ * USWDS Utilities Only
+ * 
+ * This file imports ONLY the USWDS utility classes,
+ * allowing you to use utilities globally while keeping
+ * components modular in individual blocks.
+ * 
+ * This is a lightweight base (~50-100KB) that provides
+ * spacing, typography, color, and layout utilities.
+ */
+
+// Import USWDS settings
+@import "uswds-theme-settings";
+
+// Import only required core and utilities
+@import "packages/required";
+@import "packages/uswds-utilities";
+
+// Import custom theme styles
+@import "uswds-theme-custom";
+

@@ -72,18 +72,28 @@
   margin-top: auto;
 }
 
-.dynamic-carousel .carousel-slide-content .button {
-  display: inline-block;
-  padding: 12px 24px;
-  text-decoration: none;
-  border-radius: 4px;
-  font-weight: 600;
+/* USWDS buttons in carousel - use .usa-button class */
+.dynamic-carousel .carousel-slide-content .usa-button {
+  /* Override USWDS colors to use carousel's accent color */
   background-color: var(--accent-color);
-  color: var(--background-color);
+  color: var(--button-text-color);
 }
 
-.dynamic-carousel .carousel-slide-content .button:hover {
+.dynamic-carousel .carousel-slide-content .usa-button:visited {
+  color: var(--button-text-color);
+}
+
+.dynamic-carousel .carousel-slide-content .usa-button:hover,
+.dynamic-carousel .carousel-slide-content .usa-button:focus {
+  background-color: var(--accent-color);
+  color: var(--button-text-color);
   opacity: 0.9;
+}
+
+.dynamic-carousel .carousel-slide-content .usa-button:active {
+  background-color: var(--accent-color);
+  color: var(--button-text-color);
+  opacity: 0.8;
 }
 
 /* Navigation buttons - matching original carousel */

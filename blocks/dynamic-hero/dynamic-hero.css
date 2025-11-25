@@ -63,21 +63,26 @@
   margin-top: 24px;
 }
 
-.dynamic-hero .button {
-  display: inline-block;
-  padding: 12px 24px;
-  text-decoration: none;
-  border-radius: 4px;
-  font-weight: 600;
-}
-
-.dynamic-hero .button.primary {
+/* USWDS buttons in hero - use .usa-button class */
+.dynamic-hero .usa-button {
+  /* Override USWDS colors for hero (white button on dark background) */
   background-color: #fff;
   color: #000;
 }
 
-.dynamic-hero .button.primary:hover {
+.dynamic-hero .usa-button:visited {
+  color: #000;
+}
+
+.dynamic-hero .usa-button:hover,
+.dynamic-hero .usa-button:focus {
   background-color: #f0f0f0;
+  color: #000;
+}
+
+.dynamic-hero .usa-button:active {
+  background-color: #e0e0e0;
+  color: #000;
 }
 
 @media (width >= 900px) {

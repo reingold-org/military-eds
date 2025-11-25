@@ -1,0 +1,19 @@
+/*
+ * Card Block (USWDS)
+ * 
+ * This block imports only the USWDS card component,
+ * following Edge Delivery's modular pattern.
+ */
+
+// Import USWDS settings (shared across all USWDS blocks)
+@import "../../styles/uswds/uswds-theme-settings";
+
+// Import only the required USWDS packages for cards
+@import "packages/required";
+@import "packages/usa-card";
+
+// Optional: Add block-specific customizations
+.card {
+  // Your custom card styles here
+}
+

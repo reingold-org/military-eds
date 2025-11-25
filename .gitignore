@@ -7,3 +7,19 @@ helix-importer-ui
 .DS_Store
 *.bak
 .idea
+
+# USWDS compiled output
+styles/uswds-compiled.css
+styles/uswds-compiled.css.map
+styles/uswds-utilities.css
+styles/uswds-utilities.css.map
+styles/uswds-buttons.css
+styles/uswds-buttons.css.map
+
+# USWDS modular block compiled CSS
+blocks/card/card.css
+blocks/card/card.css.map
+blocks/grid/grid.css
+blocks/grid/grid.css.map
+
+.sass-cache/

@@ -12,7 +12,7 @@ function buildHeroContent(article) {
     <div class="dynamic-hero-content">
       <h1>${article.title}</h1>
       <p>${article.description}</p>
-      ${article.path ? `<p class="button-container"><a href="${article.path}" class="button primary">Read More</a></p>` : ''}
+      ${article.path ? `<p class="button-container"><a href="${article.path}" class="usa-button">Read More</a></p>` : ''}
     </div>
   `;
 

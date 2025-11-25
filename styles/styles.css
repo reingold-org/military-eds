@@ -10,6 +10,9 @@
  * governing permissions and limitations under the License.
  */
 
+/* Import USWDS Button Styles */
+@import url('uswds-buttons.css');
+
 :root {
   /* colors */
   --background-color: white;
@@ -20,6 +23,7 @@
   --link-hover-color: #355e93;
   --accent-color: #355e93;
   --header-background-color: #000;
+  --button-text-color: white; /* default button text color */
 
   /* fonts 
   --body-font-family: roboto, roboto-fallback, sans-serif;
@@ -49,42 +53,49 @@
 body.army {
   --accent-color: #fc0;
   --link-color: #1c2226;
+  --button-text-color: #000; /* dark text on yellow for readability */
 }
 
 body.navy {
   --accent-color: #00283C;
   --link-color: #1a5eab;
   --background-dark: #00283C;
+  --button-text-color: white;
 }
 
 body.airforce {
   --accent-color: #1c2347;
   --link-color: #1a5eab;
   --background-dark: #1c2347;
+  --button-text-color: white;
 }
 
 body.marines {
   --accent-color: #e41b17;
   --link-color: #a71930;
   --background-dark: #171717;
+  --button-text-color: white;
 }
 
 body.coastguard {
   --accent-color: #007dc3;
   --link-color: #005f86;
   --background-dark: #013043;
+  --button-text-color: white;
 }
 
 body.spaceforce {
   --accent-color: #000;
   --link-color: #1a5eab;
   --background-dark: #000;
+  --button-text-color: white;
 }
 
 body.dod {
   --accent-color: #355e93;
   --link-color: #2020E0;
   --background-dark: #1c1c1c;
+  --button-text-color: white;
 }
 
 /* fallback fonts */
@@ -218,50 +229,15 @@ a:hover {
   text-decoration: underline;
 }
 
-/* buttons */
-a.button:any-link,
-button {
-  box-sizing: border-box;
-  display: inline-block;
-  max-width: 100%;
-  margin: 12px 0;
-  border: 2px solid transparent;
-  border-radius: 2.4em;
-  padding: 0.5em 1.2em;
-  font-family: var(--body-font-family);
-  font-style: normal;
-  font-weight: 500;
-  line-height: 1.25;
-  text-align: center;
-  text-decoration: none;
-  background-color: var(--link-color);
-  color: var(--background-color);
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+/* buttons - Using USWDS styles (imported above) */
 
-a.button:hover,
-a.button:focus,
-button:hover,
-button:focus {
-  background-color: var(--link-hover-color);
-  cursor: pointer;
-}
+/* The USWDS .usa-button class provides the base button styling */
 
-button:disabled,
-button:disabled:hover {
-  background-color: var(--light-color);
-  cursor: unset;
-}
+/* EDS auto-applies .button class to links, so we map it to USWDS styles */
 
-a.button.secondary,
-button.secondary {
-  background-color: unset;
-  border: 2px solid currentcolor;
-  color: var(--text-color);
-}
+/* Note: In your block JavaScript, add 'usa-button' class to buttons */
+
+/* Example: button.classList.add('usa-button'); */
 
 main img {
   max-width: 100%;

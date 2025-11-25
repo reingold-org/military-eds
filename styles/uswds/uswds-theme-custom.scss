@@ -1,0 +1,128 @@
+/*
+ * USWDS Theme Custom Styles
+ * 
+ * This file contains custom styles and overrides that build on top of USWDS.
+ * Add your custom CSS here that extends or overrides USWDS components.
+ */
+
+// ===========================================
+// Custom Theme Overrides for DoD Branches
+// ===========================================
+
+// These custom classes can be applied to body to theme the site
+// for different military branches
+
+body.army {
+  --usa-primary-color: #fc0;
+  --usa-link-color: #1c2226;
+}
+
+body.navy {
+  --usa-primary-color: #00283C;
+  --usa-link-color: #1a5eab;
+  --usa-background-dark: #00283C;
+}
+
+body.airforce {
+  --usa-primary-color: #1c2347;
+  --usa-link-color: #1a5eab;
+  --usa-background-dark: #1c2347;
+}
+
+body.marines {
+  --usa-primary-color: #e41b17;
+  --usa-link-color: #a71930;
+  --usa-background-dark: #171717;
+}
+
+body.coastguard {
+  --usa-primary-color: #007dc3;
+  --usa-link-color: #005f86;
+  --usa-background-dark: #013043;
+}
+
+body.spaceforce {
+  --usa-primary-color: #000;
+  --usa-link-color: #1a5eab;
+  --usa-background-dark: #000;
+}
+
+body.dod {
+  --usa-primary-color: #355e93;
+  --usa-link-color: #2020E0;
+  --usa-background-dark: #1c1c1c;
+}
+
+// ===========================================
+// Custom Component Extensions
+// ===========================================
+
+// Ensure headings have the accent bar from your existing design
+h1, h2, h3, h4, h5, h6 {
+  &::after {
+    background-color: var(--usa-primary-color, var(--accent-color));
+    content: "";
+    display: block;
+    height: 4px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    width: 5rem;
+  }
+}
+
+// Ensure buttons match your existing rounded style
+.usa-button {
+  border-radius: 2.4em;
+}
+
+// Custom icon styles to maintain compatibility
+.icon {
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+
+  img {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.icon-search img {
+  filter: invert(1);
+}
+
+// ===========================================
+// AEM Edge Delivery Specific Overrides
+// ===========================================
+
+// Ensure sections work with USWDS
+main > .section {
+  // Note: If you're using utilities-only build, grid-container won't be available
+  // @extend .grid-container !optional;
+  margin: 40px auto;
+
+  > div {
+    max-width: 1400px;
+    margin: auto;
+    padding: 0 24px;
+  }
+}
+
+main > .section:first-of-type {
+  margin-top: 0;
+}
+
+@media (min-width: 64em) {
+  main > .section > div {
+    padding: 0 32px;
+  }
+}
+
+// Section metadata compatibility
+main .section.light,
+main .section.highlight {
+  background-color: var(--usa-base-lightest);
+  margin: 0;
+  padding: 40px 0;
+}
+

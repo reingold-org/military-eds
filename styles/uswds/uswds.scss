@@ -1,0 +1,99 @@
+/*
+ * USWDS Main Import File
+ * 
+ * This is the main entry point for USWDS compilation.
+ * This file will be compiled to CSS and included in your project.
+ * 
+ * Compile with: npm run build:uswds
+ * Watch with: npm run watch:uswds
+ */
+
+// ===========================================
+// 1. Import USWDS Theme Settings
+// ===========================================
+// Load custom theme settings first
+@import "uswds-theme-settings";
+
+// ===========================================
+// 2. Import USWDS Core
+// ===========================================
+// This imports all of USWDS using the traditional @import syntax
+// that USWDS still uses internally
+@import "packages/required";
+@import "packages/global";
+@import "packages/uswds-components";
+@import "packages/uswds-utilities";
+
+// ===========================================
+// 3. Import Custom Theme Styles
+// ===========================================
+@import "uswds-theme-custom";
+
+// ===========================================
+// Optional: Selective Package Imports
+// ===========================================
+// If you want more control over file size, comment out the 
+// @forward "uswds" above and uncomment the selective imports below:
+
+/*
+// Packages - Core
+@forward "packages/required";
+@forward "packages/global";
+
+// Packages - Layout
+@forward "packages/uswds-core";
+@forward "packages/usa-layout-grid";
+
+// Packages - Components (uncomment only what you need)
+@forward "packages/usa-accordion";
+@forward "packages/usa-alert";
+@forward "packages/usa-banner";
+@forward "packages/usa-breadcrumb";
+@forward "packages/usa-button";
+@forward "packages/usa-button-group";
+@forward "packages/usa-card";
+@forward "packages/usa-checkbox";
+@forward "packages/usa-collection";
+@forward "packages/usa-combo-box";
+@forward "packages/usa-date-picker";
+@forward "packages/usa-date-range-picker";
+@forward "packages/usa-file-input";
+@forward "packages/usa-footer";
+@forward "packages/usa-form";
+@forward "packages/usa-header";
+@forward "packages/usa-hero";
+@forward "packages/usa-icon";
+@forward "packages/usa-icon-list";
+@forward "packages/usa-identifier";
+@forward "packages/usa-input";
+@forward "packages/usa-input-mask";
+@forward "packages/usa-input-prefix-suffix";
+@forward "packages/usa-language-selector";
+@forward "packages/usa-link";
+@forward "packages/usa-list";
+@forward "packages/usa-media-block";
+@forward "packages/usa-modal";
+@forward "packages/usa-nav";
+@forward "packages/usa-pagination";
+@forward "packages/usa-process-list";
+@forward "packages/usa-prose";
+@forward "packages/usa-radio";
+@forward "packages/usa-range";
+@forward "packages/usa-search";
+@forward "packages/usa-select";
+@forward "packages/usa-sidenav";
+@forward "packages/usa-site-alert";
+@forward "packages/usa-skipnav";
+@forward "packages/usa-step-indicator";
+@forward "packages/usa-summary-box";
+@forward "packages/usa-table";
+@forward "packages/usa-tag";
+@forward "packages/usa-textarea";
+@forward "packages/usa-time-picker";
+@forward "packages/usa-tooltip";
+@forward "packages/usa-validation";
+
+// Utilities
+@forward "packages/uswds-utilities";
+*/
+

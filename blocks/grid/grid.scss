@@ -1,0 +1,20 @@
+/*
+ * Grid Block (USWDS)
+ * 
+ * This block imports only the USWDS grid system,
+ * following Edge Delivery's modular pattern.
+ */
+
+// Import USWDS settings (shared across all USWDS blocks)
+@import "../../styles/uswds/uswds-theme-settings";
+
+// Import only the required USWDS packages for grid
+@import "packages/required";
+// Grid is part of layout-grid (no package wrapper, direct import)
+@import "packages/layout-grid";
+
+// Optional: Add block-specific customizations
+.grid {
+  // Your custom grid styles here
+}
+

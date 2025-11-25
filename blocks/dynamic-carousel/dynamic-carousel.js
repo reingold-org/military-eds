@@ -101,7 +101,7 @@ function createArticleSlide(article, slideIndex, carouselId) {
     const link = document.createElement('a');
     link.href = article.path;
     link.textContent = 'Read More';
-    link.classList.add('button', 'primary');
+    link.classList.add('usa-button');
     buttonContainer.appendChild(link);
   }
 
