@@ -9,6 +9,15 @@
       "popoverRect": "width:640px;height:520px;",
       "environments": ["edit"],
       "pinned": true
+    },
+    {
+      "id": "library",
+      "title": "Block Library",
+      "url": "/tools/sidekick/library/library-compact.html",
+      "isPalette": true,
+      "paletteRect": "left: 0; top: 0; bottom: 0; width: 320px;",
+      "environments": ["edit"],
+      "includePaths": ["**.docx**"]
     }
   ]
 }
