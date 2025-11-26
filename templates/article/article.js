@@ -32,6 +32,10 @@ function decorateArticle(main) {
   if (!h1) return;
   main.prepend(h1);
 
+  // Create the <aside> element but don't append yet
+  const aside = document.createElement('aside');
+  aside.classList.add('article-aside');
+
   const share = document.createElement('div');
   share.classList.add('section');
   share.append(buildBlock('social-share', ''));
@@ -62,19 +66,6 @@ function decorateArticle(main) {
     h1.after(byline, primary.children[3]);
   }
 
-  // Create the <aside> element
-  const aside = document.createElement('aside');
-  aside.classList.add('article-aside');
-  aside.innerHTML = '<h2>Related Articles</h2>';
-  const section = document.createElement('div');
-  section.className = 'section';
-  section.append(buildBlock('related-articles', ''));
-  decorateBlock(section.querySelector('.related-articles'));
-  aside.append(section);
-
-  main.appendChild(aside);
-  main.classList.add('loaded');
-
   // --- Add tags list at the bottom of the primary content ---
   const tags = getArticleTags();
   if (tags.length > 0) {
@@ -90,6 +81,25 @@ function decorateArticle(main) {
 
     primary.appendChild(tagSection);
   }
+
+  // Populate the aside content completely before appending to DOM
+  aside.innerHTML = '<h2>Related Articles</h2>';
+  const section = document.createElement('div');
+  section.className = 'section';
+  section.append(buildBlock('related-articles', ''));
+  decorateBlock(section.querySelector('.related-articles'));
+  aside.append(section);
+  
+  // Now append the fully populated aside to main
+  main.appendChild(aside);
+
+  // Show everything at once - both main content and aside are ready
+  main.classList.add('loaded');
+  
+  // Make aside visible shortly after main is visible for smoother appearance
+  requestAnimationFrame(() => {
+    aside.classList.add('visible');
+  });
 }
 
 export default decorateArticle;
