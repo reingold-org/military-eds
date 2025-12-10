@@ -286,6 +286,20 @@ function escapeHtml(str) {
 }
 
 /**
+ * Format keywords/tags from various formats DVIDS might return
+ */
+function formatKeywords(keywords) {
+  if (!keywords) return '';
+  if (Array.isArray(keywords)) return keywords.join(', ');
+  if (typeof keywords === 'string') return keywords;
+  if (typeof keywords === 'object') {
+    // Handle object with values
+    return Object.values(keywords).join(', ');
+  }
+  return String(keywords);
+}
+
+/**
  * Generate the HTML content for clipboard (Word-compatible)
  */
 function generateArticleHtml(article) {
@@ -343,7 +357,7 @@ function generateArticleHtml(article) {
       </tr>
       <tr>
         <td>Tags</td>
-        <td>${article.keywords ? article.keywords.join(', ') : ''}</td>
+        <td>${formatKeywords(article.keywords)}</td>
       </tr>
       <tr>
         <td>Branch</td>
