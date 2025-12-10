@@ -302,10 +302,20 @@ function formatKeywords(keywords) {
 /**
  * Generate the HTML content for clipboard (Word-compatible)
  * Uses explicit table styling that Word/SharePoint recognize
+ * @param {Object} article - Article data from DVIDS
+ * @param {Object|null} imageData - Base64 image data { dataUrl, width, height }
  */
-function generateArticleHtml(article) {
+function generateArticleHtml(article, imageData = null) {
   // Clean up body content - DVIDS returns HTML
   let bodyHtml = article.body || '';
+  
+  // Build hero image HTML with embedded base64 or fallback to URL
+  let heroImageHtml = '';
+  if (imageData && imageData.dataUrl) {
+    heroImageHtml = `<p><img src="${imageData.dataUrl}" alt="${escapeHtml(article.title || '')}" width="${imageData.width}" height="${imageData.height}"></p>`;
+  } else if (article.image) {
+    heroImageHtml = `<p><img src="${article.image}" alt="${escapeHtml(article.title || '')}" width="600"></p>`;
+  }
   
   // Build the full article HTML structure for Word
   // Word needs explicit table borders and styling to render tables properly
@@ -322,7 +332,7 @@ function generateArticleHtml(article) {
 </style>
 </head>
 <body>
-${article.image ? `<p><img src="${article.image}" alt="${escapeHtml(article.title || '')}" width="600"></p>` : ''}
+${heroImageHtml}
 
 ${bodyHtml}
 
@@ -330,52 +340,56 @@ ${bodyHtml}
 <hr>
 <p>&nbsp;</p>
 
-<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;border:1px solid black;">
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;border:1px solid black;width:100%;table-layout:fixed;">
+<colgroup>
+<col style="width:150px;">
+<col style="width:auto;">
+</colgroup>
 <tr>
-<td colspan="2" class="meta-header" style="background-color:#f0f0f0;"><strong>Metadata</strong></td>
+<td colspan="2" class="meta-header" style="background-color:#f0f0f0;border:1px solid black;"><strong>Metadata</strong></td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Title</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Title</td>
 <td style="border:1px solid black;">${escapeHtml(article.title || '')}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Description</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Description</td>
 <td style="border:1px solid black;">${escapeHtml(article.description || article.short_description || '')}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Image</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Image</td>
 <td style="border:1px solid black;">${article.image || ''}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Release Date</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Release Date</td>
 <td style="border:1px solid black;">${formatDateForMeta(article.date)}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Dateline</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Dateline</td>
 <td style="border:1px solid black;">${escapeHtml(article.location || '')}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Author</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Author</td>
 <td style="border:1px solid black;">${escapeHtml(article.credit || '')}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Tags</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Tags</td>
 <td style="border:1px solid black;">${formatKeywords(article.keywords)}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Branch</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Branch</td>
 <td style="border:1px solid black;">${article.branch || ''}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Category</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Category</td>
 <td style="border:1px solid black;">news</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Feature</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Feature</td>
 <td style="border:1px solid black;"></td>
 </tr>
 <tr>
-<td style="border:1px solid black;">template</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">template</td>
 <td style="border:1px solid black;">article</td>
 </tr>
 </table>
@@ -387,16 +401,70 @@ ${bodyHtml}
 }
 
 /**
+ * Convert an image URL to base64 data URL
+ */
+async function imageToBase64(imageUrl) {
+  if (!imageUrl) return null;
+  
+  try {
+    console.log('[IMAGE] Fetching:', imageUrl);
+    
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = imageUrl;
+    
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+    
+    console.log('[IMAGE] Loaded:', img.naturalWidth, 'x', img.naturalHeight);
+    
+    // Scale down if too large (max 800px wide for Word)
+    let width = img.naturalWidth;
+    let height = img.naturalHeight;
+    const maxWidth = 800;
+    
+    if (width > maxWidth) {
+      height = Math.round((height * maxWidth) / width);
+      width = maxWidth;
+    }
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, width, height);
+    
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    console.log('[IMAGE] Converted to base64, size:', Math.round(dataUrl.length / 1024), 'KB');
+    
+    return { dataUrl, width, height };
+  } catch (err) {
+    console.error('[IMAGE] Failed to convert:', err);
+    return null;
+  }
+}
+
+/**
  * Copy article to clipboard in HTML format
  */
 async function copyArticleToClipboard(article, overlay) {
   const copyBtn = overlay.querySelector('.btn-copy');
   copyBtn.disabled = true;
-  copyBtn.textContent = 'Copying…';
+  copyBtn.textContent = 'Loading image…';
   
   try {
-    const html = generateArticleHtml(article);
-    console.log('[GENERATED HTML]', html);
+    // Convert hero image to base64 for embedding
+    let imageData = null;
+    if (article.image) {
+      imageData = await imageToBase64(article.image);
+    }
+    
+    copyBtn.textContent = 'Copying…';
+    
+    const html = generateArticleHtml(article, imageData);
+    console.log('[GENERATED HTML]', html.substring(0, 1000) + '...');
     console.log('[HTML LENGTH]', html.length, 'characters');
     
     // Use ClipboardItem for HTML content
