@@ -185,16 +185,26 @@ async function onSelectArticle(item, card) {
     if (!article) throw new Error('No article data returned');
     
     // Debug: log full article structure
-    console.log('[ARTICLE FULL DATA]', JSON.stringify(article, null, 2));
+    console.log('[ARTICLE FULL DATA]', article);
     console.log('[ARTICLE KEY FIELDS]', {
       title: article.title,
       titleType: typeof article.title,
       credit: article.credit,
       creditType: typeof article.credit,
-      image: article.image,
-      thumbnail: article.thumbnail,
       location: article.location,
       locationType: typeof article.location,
+    });
+    // Log all fields that might contain images
+    console.log('[ARTICLE IMAGE FIELDS]', {
+      image: article.image,
+      thumbnail: article.thumbnail,
+      thumb: article.thumb,
+      thumbnail_url: article.thumbnail_url,
+      featured_image: article.featured_image,
+      photo: article.photo,
+      media: article.media,
+      assets: article.assets,
+      related: article.related,
     });
     
     showPreviewDialog(article);
@@ -322,12 +332,20 @@ function formatKeywords(keywords) {
 }
 
 /**
- * Safely extract a string value from a field that might be an object
- * DVIDS API sometimes returns objects with 'name', 'value', or other properties
+ * Safely extract a string value from a field that might be an object or array
+ * DVIDS API returns various structures for different fields
  */
 function extractStringValue(field) {
   if (!field) return '';
   if (typeof field === 'string') return field;
+  
+  // Handle arrays (like credit which is [{name: "John Doe", ...}])
+  if (Array.isArray(field)) {
+    if (field.length === 0) return '';
+    // Get first element and extract from it
+    return extractStringValue(field[0]);
+  }
+  
   if (typeof field === 'object') {
     // Try common property names
     if (field.name) return field.name;
@@ -344,6 +362,27 @@ function extractStringValue(field) {
     return '';
   }
   return String(field);
+}
+
+/**
+ * Format location object into a readable string
+ * DVIDS returns {city, state, country, state_abbreviation, country_abbreviation}
+ */
+function formatLocation(location) {
+  if (!location) return '';
+  if (typeof location === 'string') return location;
+  if (typeof location === 'object') {
+    const parts = [];
+    if (location.city) parts.push(location.city);
+    if (location.state) parts.push(location.state);
+    else if (location.state_abbreviation) parts.push(location.state_abbreviation);
+    // Only add country if it's not US (assumed default)
+    if (location.country && location.country !== 'United States') {
+      parts.push(location.country);
+    }
+    return parts.join(', ');
+  }
+  return '';
 }
 
 /**
@@ -409,7 +448,7 @@ ${bodyHtml}
 </tr>
 <tr>
 <td width="150" style="border:1px solid black;"><strong>Dateline</strong></td>
-<td style="border:1px solid black;">${escapeHtml(extractStringValue(article.location))}</td>
+<td style="border:1px solid black;">${escapeHtml(formatLocation(article.location))}</td>
 </tr>
 <tr>
 <td width="150" style="border:1px solid black;"><strong>Author</strong></td>
