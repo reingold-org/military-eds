@@ -301,85 +301,87 @@ function formatKeywords(keywords) {
 
 /**
  * Generate the HTML content for clipboard (Word-compatible)
+ * Uses explicit table styling that Word/SharePoint recognize
  */
 function generateArticleHtml(article) {
   // Clean up body content - DVIDS returns HTML
   let bodyHtml = article.body || '';
   
   // Build the full article HTML structure for Word
-  // This structure matches what EDS expects when imported
+  // Word needs explicit table borders and styling to render tables properly
   
-  const html = `
-<!DOCTYPE html>
-<html>
+  const html = `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
 <head>
-  <meta charset="UTF-8">
-  <title>${escapeHtml(article.title || 'DVIDS Article')}</title>
+<meta charset="UTF-8">
+<meta name="ProgId" content="Word.Document">
+<style>
+  table { border-collapse: collapse; width: 100%; }
+  td, th { border: 1px solid #000; padding: 8px; vertical-align: top; }
+  .meta-header { background-color: #f0f0f0; font-weight: bold; }
+</style>
 </head>
 <body>
-  <!-- Hero Image -->
-  ${article.image ? `<p><img src="${article.image}" alt="${escapeHtml(article.title || '')}"></p>` : ''}
-  
-  <!-- Article Body -->
-  ${bodyHtml}
-  
-  <hr>
-  
-  <!-- Metadata Block - This becomes the metadata table in EDS -->
-  <table>
-    <tbody>
-      <tr>
-        <td colspan="2"><strong>Metadata</strong></td>
-      </tr>
-      <tr>
-        <td>Title</td>
-        <td>${escapeHtml(article.title || '')}</td>
-      </tr>
-      <tr>
-        <td>Description</td>
-        <td>${escapeHtml(article.description || article.short_description || '')}</td>
-      </tr>
-      <tr>
-        <td>Image</td>
-        <td>${article.image ? `<img src="${article.image}" alt="" width="200">` : ''}</td>
-      </tr>
-      <tr>
-        <td>Release Date</td>
-        <td>${formatDateForMeta(article.date)}</td>
-      </tr>
-      <tr>
-        <td>Dateline</td>
-        <td>${escapeHtml(article.location || '')}</td>
-      </tr>
-      <tr>
-        <td>Author</td>
-        <td>${escapeHtml(article.credit || '')}</td>
-      </tr>
-      <tr>
-        <td>Tags</td>
-        <td>${formatKeywords(article.keywords)}</td>
-      </tr>
-      <tr>
-        <td>Branch</td>
-        <td>${article.branch || ''}</td>
-      </tr>
-      <tr>
-        <td>Category</td>
-        <td>news</td>
-      </tr>
-      <tr>
-        <td>Feature</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>template</td>
-        <td>article</td>
-      </tr>
-    </tbody>
-  </table>
+${article.image ? `<p><img src="${article.image}" alt="${escapeHtml(article.title || '')}" width="600"></p>` : ''}
+
+${bodyHtml}
+
+<p>&nbsp;</p>
+<hr>
+<p>&nbsp;</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;border:1px solid black;">
+<tr>
+<td colspan="2" class="meta-header" style="background-color:#f0f0f0;"><strong>Metadata</strong></td>
+</tr>
+<tr>
+<td style="border:1px solid black;">Title</td>
+<td style="border:1px solid black;">${escapeHtml(article.title || '')}</td>
+</tr>
+<tr>
+<td style="border:1px solid black;">Description</td>
+<td style="border:1px solid black;">${escapeHtml(article.description || article.short_description || '')}</td>
+</tr>
+<tr>
+<td style="border:1px solid black;">Image</td>
+<td style="border:1px solid black;">${article.image || ''}</td>
+</tr>
+<tr>
+<td style="border:1px solid black;">Release Date</td>
+<td style="border:1px solid black;">${formatDateForMeta(article.date)}</td>
+</tr>
+<tr>
+<td style="border:1px solid black;">Dateline</td>
+<td style="border:1px solid black;">${escapeHtml(article.location || '')}</td>
+</tr>
+<tr>
+<td style="border:1px solid black;">Author</td>
+<td style="border:1px solid black;">${escapeHtml(article.credit || '')}</td>
+</tr>
+<tr>
+<td style="border:1px solid black;">Tags</td>
+<td style="border:1px solid black;">${formatKeywords(article.keywords)}</td>
+</tr>
+<tr>
+<td style="border:1px solid black;">Branch</td>
+<td style="border:1px solid black;">${article.branch || ''}</td>
+</tr>
+<tr>
+<td style="border:1px solid black;">Category</td>
+<td style="border:1px solid black;">news</td>
+</tr>
+<tr>
+<td style="border:1px solid black;">Feature</td>
+<td style="border:1px solid black;"></td>
+</tr>
+<tr>
+<td style="border:1px solid black;">template</td>
+<td style="border:1px solid black;">article</td>
+</tr>
+</table>
+
 </body>
-</html>
-`;
+</html>`;
   
   return html;
 }
@@ -394,21 +396,20 @@ async function copyArticleToClipboard(article, overlay) {
   
   try {
     const html = generateArticleHtml(article);
-    console.log('[GENERATED HTML]', html.substring(0, 500) + '...');
-    
-    // Copy as both HTML and plain text for maximum compatibility
-    const plainText = `${article.title}\n\n${(article.body || '').replace(/<[^>]*>/g, '')}\n\n---\nSource: DVIDS (${article.url || ''})`;
+    console.log('[GENERATED HTML]', html);
+    console.log('[HTML LENGTH]', html.length, 'characters');
     
     // Use ClipboardItem for HTML content
+    // Only include text/html to force Word to use the rich format
     const blob = new Blob([html], { type: 'text/html' });
-    const textBlob = new Blob([plainText], { type: 'text/plain' });
     
     await navigator.clipboard.write([
       new ClipboardItem({
         'text/html': blob,
-        'text/plain': textBlob,
       }),
     ]);
+    
+    console.log('[CLIPBOARD] HTML written successfully');
     
     console.log('[CLIPBOARD SUCCESS]');
     copyBtn.textContent = '✅ Copied!';
