@@ -120,8 +120,15 @@ function renderArticleList(items) {
   items.forEach((item, idx) => {
     // Debug: log first item to see field structure
     if (idx === 0) {
-      console.log('[ARTICLE ITEM FIELDS]', Object.keys(item));
-      console.log('[ARTICLE ITEM]', item);
+      console.log('[SEARCH RESULT FIELDS]', Object.keys(item));
+      console.log('[SEARCH RESULT ITEM]', item);
+      console.log('[TITLE DEBUG]', {
+        title: item.title,
+        titleType: typeof item.title,
+        headline: item.headline,
+        name: item.name,
+        short_title: item.short_title,
+      });
     }
     
     const card = document.createElement('div');
@@ -137,8 +144,16 @@ function renderArticleList(items) {
     const info = document.createElement('div');
     info.className = 'info';
     
-    // Extract title - might be string or object
-    const titleText = extractStringValue(item.title) || item.headline || item.name || 'Untitled';
+    // Extract title - try multiple possible field names
+    const titleText = extractStringValue(item.title) 
+      || item.headline 
+      || item.name 
+      || item.short_title
+      || 'Untitled';
+    
+    if (idx === 0) {
+      console.log('[TITLE EXTRACTED]', titleText);
+    }
     
     const title = document.createElement('p');
     title.className = 'title';
@@ -166,6 +181,7 @@ function renderArticleList(items) {
  */
 async function onSelectArticle(item, card) {
   console.log('[SELECT]', item.id, item.title);
+  console.log('[SEARCH ITEM]', item); // Log search result to see thumbnail
   
   // Visual feedback
   document.querySelectorAll('.article-card').forEach(c => c.classList.remove('selected'));
@@ -179,32 +195,22 @@ async function onSelectArticle(item, card) {
     const res = await fetch(assetUrl, { headers: { Accept: 'application/json' } });
     if (!res.ok) throw new Error(`Asset API failed: ${res.status}`);
     const data = await res.json();
-    console.log('[ARTICLE DATA]', data);
     
     const article = data.results;
     if (!article) throw new Error('No article data returned');
     
-    // Debug: log full article structure
-    console.log('[ARTICLE FULL DATA]', article);
-    console.log('[ARTICLE KEY FIELDS]', {
+    // Use thumbnail from search result since asset API doesn't return images for news
+    // The search result 'item' has the thumbnail
+    if (!article.image && item.thumbnail) {
+      article.image = item.thumbnail;
+      console.log('[IMAGE] Using thumbnail from search result:', item.thumbnail);
+    }
+    
+    console.log('[ARTICLE WITH IMAGE]', {
       title: article.title,
-      titleType: typeof article.title,
-      credit: article.credit,
-      creditType: typeof article.credit,
-      location: article.location,
-      locationType: typeof article.location,
-    });
-    // Log all fields that might contain images
-    console.log('[ARTICLE IMAGE FIELDS]', {
       image: article.image,
-      thumbnail: article.thumbnail,
-      thumb: article.thumb,
-      thumbnail_url: article.thumbnail_url,
-      featured_image: article.featured_image,
-      photo: article.photo,
-      media: article.media,
-      assets: article.assets,
-      related: article.related,
+      credit: article.credit,
+      location: article.location,
     });
     
     showPreviewDialog(article);
