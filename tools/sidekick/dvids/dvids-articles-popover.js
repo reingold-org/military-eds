@@ -117,7 +117,13 @@ function renderArticleList(items) {
     return;
   }
   
-  items.forEach((item) => {
+  items.forEach((item, idx) => {
+    // Debug: log first item to see field structure
+    if (idx === 0) {
+      console.log('[ARTICLE ITEM FIELDS]', Object.keys(item));
+      console.log('[ARTICLE ITEM]', item);
+    }
+    
     const card = document.createElement('div');
     card.className = 'article-card';
     
@@ -125,15 +131,18 @@ function renderArticleList(items) {
     const img = document.createElement('img');
     img.className = 'thumb';
     img.src = item.thumbnail || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80"><rect fill="%23333" width="120" height="80"/><text x="60" y="45" fill="%23666" text-anchor="middle" font-size="12">No Image</text></svg>';
-    img.alt = item.title || '';
+    img.alt = extractStringValue(item.title) || '';
     
     // Info container
     const info = document.createElement('div');
     info.className = 'info';
     
+    // Extract title - might be string or object
+    const titleText = extractStringValue(item.title) || item.headline || item.name || 'Untitled';
+    
     const title = document.createElement('p');
     title.className = 'title';
-    title.textContent = item.title || 'Untitled';
+    title.textContent = titleText;
     
     const meta = document.createElement('p');
     meta.className = 'meta';
@@ -427,7 +436,7 @@ ${bodyHtml}
 
 /**
  * Convert an image URL to base64 data URL
- * Tries multiple approaches to handle CORS issues
+ * Uses the same approach as the working DVIDS image popover
  */
 async function imageToBase64(imageUrl) {
   if (!imageUrl) {
@@ -435,65 +444,17 @@ async function imageToBase64(imageUrl) {
     return null;
   }
   
-  console.log('[IMAGE] Attempting to fetch:', imageUrl);
+  console.log('[IMAGE] Loading:', imageUrl);
   
-  // Try fetching as blob first (works better with some CORS configs)
-  try {
-    const response = await fetch(imageUrl, { mode: 'cors' });
-    if (response.ok) {
-      const blob = await response.blob();
-      console.log('[IMAGE] Fetched as blob, size:', Math.round(blob.size / 1024), 'KB');
-      
-      // Convert blob to data URL
-      const dataUrl = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(blob);
-      });
-      
-      // Get dimensions by loading the data URL
-      const img = new Image();
-      img.src = dataUrl;
-      await new Promise((resolve) => { img.onload = resolve; });
-      
-      let width = img.naturalWidth;
-      let height = img.naturalHeight;
-      const maxWidth = 800;
-      
-      if (width > maxWidth) {
-        height = Math.round((height * maxWidth) / width);
-        width = maxWidth;
-        
-        // Resize using canvas
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        console.log('[IMAGE] Resized to:', width, 'x', height);
-        return { dataUrl: resizedDataUrl, width, height };
-      }
-      
-      console.log('[IMAGE] Using original size:', width, 'x', height);
-      return { dataUrl, width, height };
-    }
-  } catch (err) {
-    console.log('[IMAGE] Fetch as blob failed:', err.message, '- trying Image approach');
-  }
-  
-  // Fallback: Try loading as Image with crossOrigin
   try {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.src = imageUrl;
     
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = (e) => reject(new Error('Image load failed'));
-    });
+    // Use decode() like the working image popover does
+    await img.decode();
     
-    console.log('[IMAGE] Loaded via Image element:', img.naturalWidth, 'x', img.naturalHeight);
+    console.log('[IMAGE] Decoded:', img.naturalWidth, 'x', img.naturalHeight);
     
     let width = img.naturalWidth;
     let height = img.naturalHeight;
@@ -511,11 +472,12 @@ async function imageToBase64(imageUrl) {
     ctx.drawImage(img, 0, 0, width, height);
     
     const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-    console.log('[IMAGE] Converted to base64, size:', Math.round(dataUrl.length / 1024), 'KB');
+    console.log('[IMAGE] Converted to base64:', Math.round(dataUrl.length / 1024), 'KB');
     
     return { dataUrl, width, height };
   } catch (err) {
-    console.error('[IMAGE] All methods failed:', err.message);
+    console.error('[IMAGE] Failed to load:', err);
+    console.log('[IMAGE] URL was:', imageUrl);
     console.log('[IMAGE] Will proceed without embedded image');
     return null;
   }
@@ -531,9 +493,18 @@ async function copyArticleToClipboard(article, overlay) {
   
   try {
     // Convert hero image to base64 for embedding
+    // Check multiple possible image fields from DVIDS
+    const imageUrl = article.image || article.thumbnail || article.thumb_url;
+    console.log('[ARTICLE] Image URL:', imageUrl);
+    console.log('[ARTICLE] All image fields:', {
+      image: article.image,
+      thumbnail: article.thumbnail,
+      thumb_url: article.thumb_url,
+    });
+    
     let imageData = null;
-    if (article.image) {
-      imageData = await imageToBase64(article.image);
+    if (imageUrl) {
+      imageData = await imageToBase64(imageUrl);
     }
     
     copyBtn.textContent = 'Copying…';
