@@ -27,6 +27,15 @@
       "paletteRect": "left: 0; top: 0; bottom: 0; width: 320px;",
       "environments": ["edit"],
       "includePaths": ["**.docx**"]
+    },
+    {
+      "id": "sa11y",
+      "title": "Accessibility Check",
+      "url": "/tools/sidekick/sa11y/sa11y-plugin.html",
+      "isPalette": true,
+      "paletteRect": "right: 0; top: 0; bottom: 0; width: 320px;",
+      "environments": ["preview", "live"],
+      "pinned": true
     }
   ]
 }
