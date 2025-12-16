@@ -229,15 +229,21 @@ async function onSelectArticle(item, card) {
     
     if (imageId) {
       // Fetch the full image from asset API (like dvids-popover.js does)
-      console.log('[IMAGE] Fetching full image asset:', imageId);
+      // DVIDS API expects format: type:id (e.g., "image:9442265")
+      const formattedId = imageId.includes(':') ? imageId : `image:${imageId}`;
+      console.log('[IMAGE] Fetching full image asset:', formattedId);
       setStatus('Fetching full-resolution image…');
       try {
-        const imageAssetUrl = `${API_BASE_ASSET}?id=${encodeURIComponent(imageId)}&api_key=${API_KEY}`;
+        const imageAssetUrl = `${API_BASE_ASSET}?id=${encodeURIComponent(formattedId)}&api_key=${API_KEY}`;
+        console.log('[IMAGE] Asset URL:', imageAssetUrl);
         const imgRes = await fetch(imageAssetUrl, { headers: { Accept: 'application/json' } });
         if (imgRes.ok) {
           const imgData = await imgRes.json();
           fullImageUrl = imgData.results?.image;
           console.log('[IMAGE] Got full image URL:', fullImageUrl);
+        } else {
+          const errText = await imgRes.text();
+          console.log('[IMAGE] Asset API error:', imgRes.status, errText);
         }
       } catch (imgErr) {
         console.log('[IMAGE] Failed to fetch full image:', imgErr.message);
