@@ -139,8 +139,8 @@ function initializeSa11y(targetWindow) {
         // Detect the page language automatically
         detectPageLanguage: true,
         
-        // Panel position
-        panelPosition: 'right',
+        // Panel position - left side to avoid sidekick palette overlap
+        panelPosition: 'left',
       });
       
       resolve();
