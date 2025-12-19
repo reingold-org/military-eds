@@ -32,8 +32,8 @@
       "id": "sa11y",
       "title": "Accessibility Check",
       "url": "/tools/sidekick/sa11y/sa11y-plugin.html",
-      "isPalette": true,
-      "paletteRect": "right: 0; top: 0; bottom: 0; width: 320px;",
+      "isPopover": true,
+      "popoverRect": "width:220px;height:120px;",
       "environments": ["preview", "live"],
       "pinned": true
     }
