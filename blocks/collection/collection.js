@@ -40,13 +40,31 @@ function formatCalendarDate(timestamp) {
 }
 
 /**
- * Parse tags from a comma-separated string or array
+ * Parse tags from a comma-separated string, JSON array string, or array
  * @param {string|Array} tags - Tags as string or array
  * @returns {Array<string>}
  */
 function parseTags(tags) {
   if (!tags) return [];
   if (Array.isArray(tags)) return tags;
+
+  // Handle JSON array string like '["tag1", "tag2"]'
+  const trimmed = tags.trim();
+  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed.map((tag) => String(tag).trim()).filter(Boolean);
+      }
+    } catch (e) {
+      // Not valid JSON, fall through to manual parsing
+      // Remove brackets and split
+      const withoutBrackets = trimmed.slice(1, -1);
+      return withoutBrackets.split(',').map((tag) => tag.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+    }
+  }
+
+  // Handle comma-separated string
   return tags.split(',').map((tag) => tag.trim()).filter(Boolean);
 }
 
