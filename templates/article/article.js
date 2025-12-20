@@ -89,13 +89,13 @@ function decorateArticle(main) {
   section.append(buildBlock('related-articles', ''));
   decorateBlock(section.querySelector('.related-articles'));
   aside.append(section);
-  
+
   // Now append the fully populated aside to main
   main.appendChild(aside);
 
   // Show everything at once - both main content and aside are ready
   main.classList.add('loaded');
-  
+
   // Make aside visible shortly after main is visible for smoother appearance
   requestAnimationFrame(() => {
     aside.classList.add('visible');

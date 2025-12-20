@@ -101,7 +101,6 @@ function parseBlockContent(block) {
  */
 function parseStaticRow(row) {
   const item = {};
-  const cells = [...row.children];
 
   // Look for link in first cell (title/heading)
   const link = row.querySelector('a');
@@ -362,4 +361,3 @@ export default async function decorate(block) {
 
   block.appendChild(ul);
 }
-
