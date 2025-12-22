@@ -234,7 +234,7 @@
 }
 
 .section.collection-container .collection-wrapper {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
 }
@@ -242,6 +242,258 @@
 @media (width >= 900px) {
   .section.collection-container .collection-wrapper {
     padding: 0 32px;
+  }
+}
+
+/* ============================================
+   Filter Bar Styles (Facet + Search)
+   ============================================ */
+
+.collection-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #dfe1e2;
+}
+
+.collection-filter__facet,
+.collection-filter__search {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.collection-filter__search {
+  margin-left: auto;
+}
+
+.collection-filter__label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1b1b1b;
+  white-space: nowrap;
+}
+
+.collection-filter__select {
+  appearance: none;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231b1b1b'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1.25rem;
+  border: 1px solid #565c65;
+  border-radius: 4px;
+  color: #1b1b1b;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1.4;
+  max-width: 100%;
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  width: auto;
+  min-width: 150px;
+}
+
+.collection-filter__select:hover {
+  border-color: #1b1b1b;
+}
+
+.collection-filter__select:focus {
+  border-color: var(--link-color, #005ea2);
+  outline: 2px solid var(--link-color, #005ea2);
+  outline-offset: 0;
+}
+
+.collection-filter__input {
+  appearance: none;
+  background-color: #fff;
+  border: 1px solid #565c65;
+  border-radius: 4px;
+  color: #1b1b1b;
+  font-size: 1rem;
+  line-height: 1.4;
+  padding: 0.5rem 0.75rem;
+  width: 200px;
+  max-width: 100%;
+}
+
+.collection-filter__input::placeholder {
+  color: #71767a;
+}
+
+.collection-filter__input:hover {
+  border-color: #1b1b1b;
+}
+
+.collection-filter__input:focus {
+  border-color: var(--link-color, #005ea2);
+  outline: 2px solid var(--link-color, #005ea2);
+  outline-offset: 0;
+}
+
+@media (width < 640px) {
+  .collection-filter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .collection-filter__facet,
+  .collection-filter__search {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .collection-filter__search {
+    margin-left: 0;
+  }
+
+  .collection-filter__select,
+  .collection-filter__input {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   Pagination Styles (USWDS-inspired)
+   ============================================ */
+
+.usa-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #dfe1e2;
+}
+
+.usa-pagination__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.usa-pagination__item {
+  display: flex;
+}
+
+.usa-pagination__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background-color: transparent;
+  color: var(--link-color, #005ea2);
+  font-size: 1rem;
+  font-weight: 400;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.usa-pagination__button:hover {
+  background-color: #f0f0f0;
+  border-color: #dfe1e2;
+  text-decoration: none;
+}
+
+.usa-pagination__button.usa-current {
+  background-color: var(--link-color, #005ea2);
+  color: #fff;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.usa-pagination__button.usa-current:hover {
+  background-color: var(--link-color, #005ea2);
+}
+
+/* Arrow buttons */
+.usa-pagination__arrow {
+  min-width: auto;
+}
+
+.usa-pagination__link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--link-color, #005ea2);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.usa-pagination__link:hover {
+  background-color: #f0f0f0;
+  text-decoration: none;
+}
+
+.usa-pagination__previous-page::before {
+  content: '‹';
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.usa-pagination__next-page::after {
+  content: '›';
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+/* Overflow ellipsis */
+.usa-pagination__overflow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  color: #565c65;
+  font-size: 1rem;
+}
+
+/* Responsive - hide text on mobile, show arrows only */
+@media (width < 480px) {
+  .usa-pagination__link-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .usa-pagination__link {
+    padding: 0.5rem;
+  }
+
+  .usa-pagination__previous-page::before,
+  .usa-pagination__next-page::after {
+    font-size: 1.5rem;
+  }
+
+  .usa-pagination__button {
+    min-width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.9375rem;
   }
 }
 

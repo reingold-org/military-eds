@@ -41,3 +41,38 @@
     padding: 240px 32px;
   }
 }
+
+/* Slim variant */
+.hero.slim {
+  min-height: 230px;
+  height: 230px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.hero.slim img {
+  object-position: center;
+}
+
+.hero.slim > div {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.hero.slim h1 {
+  font-size: 36px;
+  margin: 0;
+}
+
+@media (width >= 900px) {
+  .hero.slim > div {
+    padding: 0 32px;
+  }
+
+  .hero.slim h1 {
+    font-size: 44px;
+  }
+}

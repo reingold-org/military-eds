@@ -108,3 +108,246 @@
   }
 }
 
+/* ============================================
+   TILES VARIANT - Marines.mil inspired layout
+   Usage: Dynamic Cards (tiles)
+   ============================================ */
+
+.dynamic-cards.tiles {
+  --image-card-gap: 8px;
+  --image-card-accent-color: var(--accent-color, #c00);
+  --image-card-text-color: #fff;
+  --image-card-overlay-start: rgb(0 0 0 / 0%);
+  --image-card-overlay-end: rgb(0 0 0 / 85%);
+}
+
+/* Grid Container */
+.dynamic-cards.tiles .tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--image-card-gap);
+}
+
+/* Base Card Styles */
+.dynamic-cards.tiles .tile {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  min-height: 300px;
+}
+
+/* Card Sizes - Grid Placement */
+.dynamic-cards.tiles .tile-large {
+  grid-column: span 6;
+  min-height: 450px;
+}
+
+.dynamic-cards.tiles .tile-medium {
+  grid-column: span 3;
+  min-height: 400px;
+}
+
+.dynamic-cards.tiles .tile-small {
+  grid-column: span 2;
+  min-height: 350px;
+}
+
+/* Background Image */
+.dynamic-cards.tiles .tile-background {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.dynamic-cards.tiles .tile-background picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.dynamic-cards.tiles article .tile-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.dynamic-cards.tiles .tile:hover .tile-background img {
+  transform: scale(1.05);
+}
+
+/* Gradient Overlay */
+.dynamic-cards.tiles .tile-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    to top,
+    var(--image-card-overlay-end) 0%,
+    var(--image-card-overlay-end) 20%,
+    var(--image-card-overlay-start) 60%
+  );
+  pointer-events: none;
+}
+
+/* Content Container */
+.dynamic-cards.tiles .tile-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dynamic-cards.tiles .tile-large .tile-content {
+  padding: 40px;
+  max-width: 700px;
+}
+
+.dynamic-cards.tiles .tile-medium .tile-content {
+  padding: 32px;
+}
+
+/* Title */
+.dynamic-cards.tiles .tile-title {
+  margin: 0;
+  font-family: var(--heading-font-family);
+  font-weight: 700;
+  color: var(--image-card-text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.dynamic-cards.tiles .tile-large .tile-title {
+  font-size: clamp(24px, 4vw, 42px);
+}
+
+.dynamic-cards.tiles .tile-medium .tile-title {
+  font-size: clamp(18px, 2.5vw, 26px);
+}
+
+.dynamic-cards.tiles .tile-small .tile-title {
+  font-size: clamp(16px, 2vw, 20px);
+}
+
+/* Description */
+.dynamic-cards.tiles .tile-description {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--image-card-text-color);
+  opacity: 0.9;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.dynamic-cards.tiles .tile-large .tile-description {
+  font-size: 16px;
+  -webkit-line-clamp: 4;
+}
+
+/* Read More Button (USWDS styled) */
+.dynamic-cards.tiles .tile-link {
+  margin-top: 12px;
+}
+
+.dynamic-cards.tiles .tile-link .usa-button {
+  background-color: var(--image-card-accent-color);
+  font-size: 0.95rem;
+  padding: 0.625rem 1.25rem;
+}
+
+.dynamic-cards.tiles .tile-link .usa-button:hover {
+  background-color: var(--image-card-accent-color);
+  opacity: 0.85;
+}
+
+.dynamic-cards.tiles .tile-link .usa-button:visited {
+  color: #fff;
+}
+
+/* TILES VARIANT: Responsive - Tablet */
+@media (width <= 1024px) {
+  .dynamic-cards.tiles .tiles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dynamic-cards.tiles .tile-large {
+    grid-column: span 2;
+    min-height: 400px;
+  }
+
+  .dynamic-cards.tiles .tile-medium {
+    grid-column: span 1;
+    min-height: 350px;
+  }
+
+  .dynamic-cards.tiles .tile-small {
+    grid-column: span 1;
+    min-height: 300px;
+  }
+
+  .dynamic-cards.tiles .tile-large .tile-content {
+    padding: 32px;
+  }
+
+  .dynamic-cards.tiles .tile-medium .tile-content,
+  .dynamic-cards.tiles .tile-small .tile-content {
+    padding: 24px;
+  }
+}
+
+/* TILES VARIANT: Responsive - Mobile */
+@media (width <= 600px) {
+  .dynamic-cards.tiles {
+    --image-card-gap: 6px;
+  }
+
+  .dynamic-cards.tiles .tiles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dynamic-cards.tiles .tile-large,
+  .dynamic-cards.tiles .tile-medium,
+  .dynamic-cards.tiles .tile-small {
+    grid-column: span 1;
+    min-height: 280px;
+  }
+
+  .dynamic-cards.tiles .tile-large {
+    min-height: 320px;
+  }
+
+  .dynamic-cards.tiles .tile-content {
+    padding: 20px;
+  }
+
+  .dynamic-cards.tiles .tile-large .tile-content {
+    padding: 24px;
+  }
+
+  .dynamic-cards.tiles .tile-large .tile-title {
+    font-size: 22px;
+  }
+
+  .dynamic-cards.tiles .tile-medium .tile-title,
+  .dynamic-cards.tiles .tile-small .tile-title {
+    font-size: 18px;
+  }
+
+  .dynamic-cards.tiles .tile-description {
+    font-size: 14px;
+    -webkit-line-clamp: 2;
+  }
+
+  .dynamic-cards.tiles .tile-small .tile-description {
+    display: none;
+  }
+}

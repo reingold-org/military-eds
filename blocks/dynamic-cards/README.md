@@ -37,6 +37,41 @@ In your AEM document, create a block with configuration options:
 | tag        | navy     |
 ```
 
+---
+
+## Tiles Variant
+
+The **tiles variant** displays cards in a Marines.mil-inspired layout with:
+- Full-bleed background images
+- Gradient overlay with text
+- 1-2-3 grid pattern (1 large, 2 medium, then 3 per row)
+- Accent bar and "Read More" link
+
+### Usage
+
+Add `(tiles)` after the block name:
+
+```
+| Dynamic Cards (tiles) |
+| limit      | 6        |
+```
+
+### Tiles Variant Layout
+
+- **Row 1:** 1 large card (full width)
+- **Row 2:** 2 medium cards (half width each)
+- **Row 3+:** 3 small cards per row (third width each)
+
+### Example with Options
+
+```
+| Dynamic Cards (tiles) |
+| limit      | 9        |
+| featured   | true     |
+```
+
+---
+
 ## Configuration Options
 
 | Option     | Type    | Default | Description                                    |
@@ -46,6 +81,13 @@ In your AEM document, create a block with configuration options:
 | `category` | string  | -       | Filter by specific category                    |
 | `tag`      | string  | -       | Filter by specific tag                         |
 
+## Variants
+
+| Variant   | Description                                                      |
+|-----------|------------------------------------------------------------------|
+| (default) | Standard card grid with image, title, description, and button    |
+| `tiles`   | Full-bleed background images with overlay text (1-2-3 layout)    |
+
 ## Features
 
 - ✅ Responsive grid layout (auto-adjusts columns based on screen size)
@@ -53,14 +95,19 @@ In your AEM document, create a block with configuration options:
 - ✅ Hover effects on cards
 - ✅ Clean, modern design
 - ✅ Mobile-friendly
+- ✅ **Tiles variant** for immersive photo-centric layouts
 
 ## Layout
 
+### Default Variant
 - **Mobile:** 1 column
 - **Tablet:** 2-3 columns (depends on screen width)
 - **Desktop:** 3-4 columns (depends on screen width and card count)
 
-The grid automatically adjusts to fit the content and screen size using CSS Grid with `auto-fill`.
+### Tiles Variant
+- **Mobile:** 1 column (all cards stacked)
+- **Tablet:** 2 columns (large spans full, others 1 each)
+- **Desktop:** 6-column grid (large=6, medium=3, small=2)
 
 ## Notes
 
@@ -69,4 +116,5 @@ The grid automatically adjusts to fit the content and screen size using CSS Grid
 - Images are optimized for different screen sizes and formats (WebP, JPEG)
 - All cards have consistent heights for a clean grid appearance
 - **Automatic Deduplication:** If a Dynamic Hero block appears on the same page, the cards will automatically exclude the hero's article to prevent duplicates. This also works between multiple dynamic blocks on the same page.
+- The **tiles variant** uses the branch's accent color for the accent bar and link icon
 
