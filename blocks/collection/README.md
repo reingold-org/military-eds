@@ -50,7 +50,10 @@ With filtering:
 | Key | Description | Default |
 |-----|-------------|---------|
 | `source` | URL to query index (enables dynamic mode) | - |
-| `limit` | Maximum number of items to display | 6 |
+| `limit` | Maximum number of items to display (0 = no limit) | 0 |
+| `pagination` | Items per page (0 = no pagination) | 0 |
+| `facets` | Show tag filter dropdown (`true`/`false`) | `false` |
+| `search` | Show keyword search field (`true`/`false`) | `false` |
 | `category` | Filter by category field | - |
 | `tag` | Filter by tag (checks if tags field contains value) | - |
 | `filter` | Generic filter in `field:value` format | - |
@@ -113,6 +116,58 @@ Use block variants by adding them in parentheses:
 | source | /news/query-index.json |
 | limit | 10 |
 | category | announcements |
+
+### With Pagination
+
+Display items with page navigation (5 items per page):
+
+| Collection (thumbnail) |
+|------------------------|
+| source | /news/query-index.json |
+| pagination | 5 |
+
+Pagination with limit (show max 20 items total, 5 per page):
+
+| Collection |
+|------------|
+| source | /news/query-index.json |
+| limit | 20 |
+| pagination | 5 |
+
+### With Tag Facet Filter
+
+Display a dropdown to filter items by their tags:
+
+| Collection (thumbnail) |
+|------------------------|
+| source | /news/query-index.json |
+| facets | true |
+
+Combine with pagination:
+
+| Collection |
+|------------|
+| source | /news/query-index.json |
+| facets | true |
+| pagination | 6 |
+
+### With Keyword Search
+
+Add a search field to filter items by keyword:
+
+| Collection (thumbnail) |
+|------------------------|
+| source | /news/query-index.json |
+| search | true |
+
+Combine with facets and pagination:
+
+| Collection |
+|------------|
+| source | /news/query-index.json |
+| facets | true |
+| search | true |
+| pagination | 6 |
 
 ## Expected Query Index Fields
 

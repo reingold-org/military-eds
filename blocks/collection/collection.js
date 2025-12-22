@@ -40,6 +40,26 @@ function formatCalendarDate(timestamp) {
 }
 
 /**
+ * Format a tag for display (replace hyphens with spaces)
+ * @param {string} tag - Raw tag value
+ * @returns {string} Formatted tag
+ */
+function formatTagForDisplay(tag) {
+  return tag.replace(/-/g, ' ');
+}
+
+/**
+ * Format a tag for dropdown (title case, replace hyphens with spaces)
+ * @param {string} tag - Raw tag value
+ * @returns {string} Formatted tag in title case
+ */
+function formatTagTitleCase(tag) {
+  return tag
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+/**
  * Parse tags from a comma-separated string, JSON array string, or array
  * @param {string|Array} tags - Tags as string or array
  * @returns {Array<string>}
@@ -75,11 +95,14 @@ function parseTags(tags) {
  */
 function parseBlockContent(block) {
   const config = {
-    limit: 6,
+    limit: 0, // 0 means no limit
     sortBy: 'date',
+    pagination: 0, // 0 means no pagination
+    facets: false, // Enable tag facet filter
+    search: false, // Enable keyword search
   };
   const contentRows = [];
-  const configKeys = ['source', 'limit', 'category', 'tag', 'filter', 'sortby'];
+  const configKeys = ['source', 'limit', 'category', 'tag', 'filter', 'sortby', 'pagination', 'facets', 'search'];
 
   [...block.children].forEach((row) => {
     const cells = [...row.children];
@@ -89,7 +112,13 @@ function parseBlockContent(block) {
 
       if (configKeys.includes(key)) {
         if (key === 'limit') {
-          config.limit = parseInt(value, 10) || 6;
+          config.limit = parseInt(value, 10) || 0;
+        } else if (key === 'pagination') {
+          config.pagination = parseInt(value, 10) || 0;
+        } else if (key === 'facets') {
+          config.facets = value.toLowerCase() === 'true';
+        } else if (key === 'search') {
+          config.search = value.toLowerCase() === 'true';
         } else if (key === 'sortby') {
           config.sortBy = value;
         } else if (key === 'source') {
@@ -252,7 +281,7 @@ function buildCollectionItem(item, options = {}) {
     tags.forEach((tag) => {
       const tagLi = document.createElement('li');
       tagLi.className = 'usa-collection__meta-item usa-tag';
-      tagLi.textContent = tag;
+      tagLi.textContent = formatTagForDisplay(tag);
       metaList.appendChild(tagLi);
     });
 
@@ -335,6 +364,423 @@ async function fetchDynamicItems(source, config) {
   }
 }
 
+/**
+ * Extract unique tags from all items
+ * @param {Array} items - Collection items
+ * @returns {Array<string>} Sorted unique tags
+ */
+function extractUniqueTags(items) {
+  const tagSet = new Set();
+
+  items.forEach((item) => {
+    const tags = parseTags(item.tags);
+    tags.forEach((tag) => tagSet.add(tag));
+  });
+
+  return [...tagSet].sort((a, b) => a.localeCompare(b));
+}
+
+/**
+ * Build filter bar with facet dropdown and search field
+ * @param {Object} filterOptions - Filter configuration
+ * @returns {HTMLElement}
+ */
+function buildFilterBar(filterOptions) {
+  const {
+    tags = [],
+    selectedTag = '',
+    searchQuery = '',
+    showFacets = false,
+    showSearch = false,
+    onFilterChange,
+    onSearchChange,
+  } = filterOptions;
+
+  const filterContainer = document.createElement('div');
+  filterContainer.className = 'collection-filter';
+
+  // Left side: Facet dropdown
+  if (showFacets && tags.length > 0) {
+    const facetGroup = document.createElement('div');
+    facetGroup.className = 'collection-filter__facet';
+
+    const label = document.createElement('label');
+    label.className = 'collection-filter__label';
+    label.setAttribute('for', 'collection-tag-filter');
+    label.textContent = 'Filter by topic:';
+
+    const select = document.createElement('select');
+    select.className = 'collection-filter__select';
+    select.id = 'collection-tag-filter';
+
+    // Add "All" option
+    const allOption = document.createElement('option');
+    allOption.value = '';
+    allOption.textContent = 'All';
+    if (!selectedTag) allOption.selected = true;
+    select.appendChild(allOption);
+
+    // Add tag options
+    tags.forEach((tag) => {
+      const option = document.createElement('option');
+      option.value = tag;
+      option.textContent = formatTagTitleCase(tag);
+      if (tag === selectedTag) option.selected = true;
+      select.appendChild(option);
+    });
+
+    select.addEventListener('change', (e) => {
+      onFilterChange(e.target.value);
+    });
+
+    facetGroup.appendChild(label);
+    facetGroup.appendChild(select);
+    filterContainer.appendChild(facetGroup);
+  }
+
+  // Right side: Search field
+  if (showSearch) {
+    const searchGroup = document.createElement('div');
+    searchGroup.className = 'collection-filter__search';
+
+    const searchLabel = document.createElement('label');
+    searchLabel.className = 'collection-filter__label';
+    searchLabel.setAttribute('for', 'collection-search');
+    searchLabel.textContent = 'Search:';
+
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.className = 'collection-filter__input';
+    searchInput.id = 'collection-search';
+    searchInput.placeholder = 'Enter keywords...';
+    searchInput.value = searchQuery;
+
+    // Debounce search input
+    let debounceTimer;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        onSearchChange(e.target.value);
+      }, 300);
+    });
+
+    // Allow immediate search on Enter
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        clearTimeout(debounceTimer);
+        onSearchChange(e.target.value);
+      }
+    });
+
+    searchGroup.appendChild(searchLabel);
+    searchGroup.appendChild(searchInput);
+    filterContainer.appendChild(searchGroup);
+  }
+
+  return filterContainer;
+}
+
+/**
+ * Filter items by tag
+ * @param {Array} items - All items
+ * @param {string} tag - Tag to filter by (empty = no filter)
+ * @returns {Array} Filtered items
+ */
+function filterItemsByTag(items, tag) {
+  if (!tag) return items;
+
+  return items.filter((item) => {
+    const itemTags = parseTags(item.tags);
+    return itemTags.includes(tag);
+  });
+}
+
+/**
+ * Filter items by search query
+ * @param {Array} items - All items
+ * @param {string} query - Search query (empty = no filter)
+ * @returns {Array} Filtered items
+ */
+function filterItemsBySearch(items, query) {
+  if (!query || !query.trim()) return items;
+
+  const searchTerms = query.toLowerCase().trim().split(/\s+/);
+
+  return items.filter((item) => {
+    // Combine searchable text fields
+    const searchableText = [
+      item.title || '',
+      item.description || '',
+      item.author || '',
+      ...(parseTags(item.tags).map((tag) => formatTagForDisplay(tag))),
+    ].join(' ').toLowerCase();
+
+    // All search terms must match
+    return searchTerms.every((term) => searchableText.includes(term));
+  });
+}
+
+/**
+ * Create a single page item
+ */
+function createPageItem(pageNum, currentPage, onPageChange) {
+  const li = document.createElement('li');
+  li.className = 'usa-pagination__item usa-pagination__page-no';
+
+  const link = document.createElement('a');
+  link.href = '#';
+  link.className = 'usa-pagination__button';
+  link.textContent = pageNum;
+  link.setAttribute('aria-label', `Page ${pageNum}`);
+
+  if (pageNum === currentPage) {
+    link.classList.add('usa-current');
+    link.setAttribute('aria-current', 'page');
+  }
+
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (pageNum !== currentPage) {
+      onPageChange(pageNum);
+    }
+  });
+
+  li.appendChild(link);
+  return li;
+}
+
+/**
+ * Build pagination controls
+ * @param {number} currentPage - Current page (1-indexed)
+ * @param {number} totalPages - Total number of pages
+ * @param {Function} onPageChange - Callback when page changes
+ * @returns {HTMLElement}
+ */
+function buildPagination(currentPage, totalPages, onPageChange) {
+  const nav = document.createElement('nav');
+  nav.className = 'usa-pagination';
+  nav.setAttribute('aria-label', 'Pagination');
+
+  const ul = document.createElement('ul');
+  ul.className = 'usa-pagination__list';
+
+  // Previous button
+  const prevLi = document.createElement('li');
+  prevLi.className = 'usa-pagination__item usa-pagination__arrow';
+  if (currentPage > 1) {
+    const prevLink = document.createElement('a');
+    prevLink.href = '#';
+    prevLink.className = 'usa-pagination__link usa-pagination__previous-page';
+    prevLink.setAttribute('aria-label', 'Previous page');
+    prevLink.innerHTML = '<span class="usa-pagination__link-text">Previous</span>';
+    prevLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      onPageChange(currentPage - 1);
+    });
+    prevLi.appendChild(prevLink);
+  }
+  ul.appendChild(prevLi);
+
+  // Page numbers
+  const maxVisiblePages = 7;
+  let startPage = 1;
+  let endPage = totalPages;
+
+  if (totalPages > maxVisiblePages) {
+    const halfVisible = Math.floor(maxVisiblePages / 2);
+    startPage = Math.max(1, currentPage - halfVisible);
+    endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+  }
+
+  // First page and ellipsis
+  if (startPage > 1) {
+    ul.appendChild(createPageItem(1, currentPage, onPageChange));
+    if (startPage > 2) {
+      const ellipsis = document.createElement('li');
+      ellipsis.className = 'usa-pagination__item usa-pagination__overflow';
+      ellipsis.setAttribute('aria-hidden', 'true');
+      ellipsis.innerHTML = '<span>…</span>';
+      ul.appendChild(ellipsis);
+    }
+  }
+
+  // Page numbers
+  for (let i = startPage; i <= endPage; i += 1) {
+    ul.appendChild(createPageItem(i, currentPage, onPageChange));
+  }
+
+  // Last page and ellipsis
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      const ellipsis = document.createElement('li');
+      ellipsis.className = 'usa-pagination__item usa-pagination__overflow';
+      ellipsis.setAttribute('aria-hidden', 'true');
+      ellipsis.innerHTML = '<span>…</span>';
+      ul.appendChild(ellipsis);
+    }
+    ul.appendChild(createPageItem(totalPages, currentPage, onPageChange));
+  }
+
+  // Next button
+  const nextLi = document.createElement('li');
+  nextLi.className = 'usa-pagination__item usa-pagination__arrow';
+  if (currentPage < totalPages) {
+    const nextLink = document.createElement('a');
+    nextLink.href = '#';
+    nextLink.className = 'usa-pagination__link usa-pagination__next-page';
+    nextLink.setAttribute('aria-label', 'Next page');
+    nextLink.innerHTML = '<span class="usa-pagination__link-text">Next</span>';
+    nextLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      onPageChange(currentPage + 1);
+    });
+    nextLi.appendChild(nextLink);
+  }
+  ul.appendChild(nextLi);
+
+  nav.appendChild(ul);
+  return nav;
+}
+
+/**
+ * Render collection with pagination, facet filter, and search support
+ */
+function renderCollection(block, allItems, options, renderConfig) {
+  const {
+    showThumbnail,
+    showCalendar,
+    headingsOnly,
+    condensed,
+  } = options;
+
+  const {
+    itemsPerPage,
+    currentPage = 1,
+    showFacets = false,
+    showSearch = false,
+    selectedTag = '',
+    searchQuery = '',
+    allTags = [],
+  } = renderConfig;
+
+  // Filter items by selected tag and search query
+  let filteredItems = filterItemsByTag(allItems, selectedTag);
+  filteredItems = filterItemsBySearch(filteredItems, searchQuery);
+
+  // Calculate pagination
+  const totalItems = filteredItems.length;
+  const totalPages = itemsPerPage > 0 ? Math.ceil(totalItems / itemsPerPage) : 1;
+  const startIndex = itemsPerPage > 0 ? (currentPage - 1) * itemsPerPage : 0;
+  const endIndex = itemsPerPage > 0 ? startIndex + itemsPerPage : totalItems;
+  const pageItems = filteredItems.slice(startIndex, endIndex);
+
+  // Save focus state before clearing
+  const searchInput = block.querySelector('#collection-search');
+  const wasSearchFocused = searchInput && document.activeElement === searchInput;
+  const cursorPosition = wasSearchFocused ? searchInput.selectionStart : 0;
+
+  // Clear block
+  block.innerHTML = '';
+
+  // Add filter bar (facets and/or search)
+  const showFilterBar = showFacets || showSearch;
+  if (showFilterBar) {
+    const filterBar = buildFilterBar({
+      tags: allTags,
+      selectedTag,
+      searchQuery,
+      showFacets: showFacets && allTags.length > 0,
+      showSearch,
+      onFilterChange: (newTag) => {
+        renderCollection(block, allItems, options, {
+          itemsPerPage,
+          currentPage: 1, // Reset to page 1 when filter changes
+          showFacets,
+          showSearch,
+          selectedTag: newTag,
+          searchQuery,
+          allTags,
+        });
+      },
+      onSearchChange: (newQuery) => {
+        renderCollection(block, allItems, options, {
+          itemsPerPage,
+          currentPage: 1, // Reset to page 1 when search changes
+          showFacets,
+          showSearch,
+          selectedTag,
+          searchQuery: newQuery,
+          allTags,
+        });
+      },
+    });
+    block.appendChild(filterBar);
+
+    // Restore focus to search input if it was focused before
+    if (wasSearchFocused) {
+      const newSearchInput = block.querySelector('#collection-search');
+      if (newSearchInput) {
+        newSearchInput.focus();
+        newSearchInput.setSelectionRange(cursorPosition, cursorPosition);
+      }
+    }
+  }
+
+  if (pageItems.length === 0) {
+    const emptyMsg = document.createElement('p');
+    emptyMsg.className = 'usa-collection__empty';
+    if (searchQuery && selectedTag) {
+      emptyMsg.textContent = `No items found matching "${searchQuery}" with tag "${formatTagTitleCase(selectedTag)}".`;
+    } else if (searchQuery) {
+      emptyMsg.textContent = `No items found matching "${searchQuery}".`;
+    } else if (selectedTag) {
+      emptyMsg.textContent = `No items found with tag "${formatTagTitleCase(selectedTag)}".`;
+    } else {
+      emptyMsg.textContent = 'No items available.';
+    }
+    block.appendChild(emptyMsg);
+    return;
+  }
+
+  // Build collection list
+  const ul = document.createElement('ul');
+  ul.className = 'usa-collection';
+  if (condensed) ul.classList.add('usa-collection--condensed');
+
+  pageItems.forEach((item) => {
+    const li = buildCollectionItem(item, {
+      showThumbnail,
+      showCalendar,
+      headingsOnly,
+    });
+    ul.appendChild(li);
+  });
+
+  block.appendChild(ul);
+
+  // Add pagination if needed
+  if (itemsPerPage > 0 && totalPages > 1) {
+    const pagination = buildPagination(currentPage, totalPages, (newPage) => {
+      renderCollection(block, allItems, options, {
+        itemsPerPage,
+        currentPage: newPage,
+        showFacets,
+        showSearch,
+        selectedTag,
+        searchQuery,
+        allTags,
+      });
+      // Scroll to top of block
+      block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    block.appendChild(pagination);
+  }
+}
+
 export default async function decorate(block) {
   // Determine variant from block classes
   const showThumbnail = block.classList.contains('thumbnail') || block.classList.contains('media');
@@ -355,7 +801,7 @@ export default async function decorate(block) {
     items = contentRows.map(parseStaticRow).filter((item) => item.title || item.path);
   }
 
-  // Clear block and build collection
+  // Clear block and render collection
   block.innerHTML = '';
 
   if (items.length === 0) {
@@ -363,19 +809,21 @@ export default async function decorate(block) {
     return;
   }
 
-  // Build collection list
-  const ul = document.createElement('ul');
-  ul.className = 'usa-collection';
-  if (condensed) ul.classList.add('usa-collection--condensed');
+  // Extract unique tags for facet filter
+  const allTags = config.facets ? extractUniqueTags(items) : [];
 
-  items.forEach((item) => {
-    const li = buildCollectionItem(item, {
-      showThumbnail,
-      showCalendar,
-      headingsOnly,
-    });
-    ul.appendChild(li);
+  // Render with pagination and facet support
+  renderCollection(block, items, {
+    showThumbnail,
+    showCalendar,
+    headingsOnly,
+    condensed,
+  }, {
+    itemsPerPage: config.pagination,
+    currentPage: 1,
+    showFacets: config.facets,
+    showSearch: config.search,
+    selectedTag: '',
+    allTags,
   });
-
-  block.appendChild(ul);
 }
