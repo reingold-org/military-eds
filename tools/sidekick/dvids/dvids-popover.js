@@ -321,15 +321,26 @@ function showVideoDialog(videoData, videoUrl) {
   // Select all on focus
   urlInput.addEventListener('focus', () => urlInput.select());
 
-  // Copy URL button
+  // Copy URL button - copy as both HTML (for Word) and plain text
   overlay.querySelector('.copy-url-btn').addEventListener('click', async () => {
     try {
-      await navigator.clipboard.writeText(videoUrl);
+      // Create HTML link for rich text paste (Word, Google Docs, etc.)
+      const htmlContent = `<a href="${videoUrl}">${videoUrl}</a>`;
+      const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+      const textBlob = new Blob([videoUrl], { type: 'text/plain' });
+
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html': htmlBlob,
+          'text/plain': textBlob,
+        }),
+      ]);
+
       const btn = overlay.querySelector('.copy-url-btn');
       btn.textContent = '✅ URL Copied!';
       btn.disabled = true;
-      setStatus('✅ Video URL copied to clipboard');
-      console.log('[VIDEO URL COPIED]', videoUrl);
+      setStatus('✅ Video URL copied as link');
+      console.log('[VIDEO URL COPIED AS LINK]', videoUrl);
 
       // Auto-close after a moment
       setTimeout(() => {

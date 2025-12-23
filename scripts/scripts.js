@@ -252,11 +252,73 @@ async function loadFonts() {
 }
 
 /**
+ * Checks if a URL is a supported video URL (YouTube, Vimeo, DVIDS)
+ * @param {string} href - The URL to check
+ * @returns {boolean} - True if it's a video URL
+ */
+function isVideoUrl(href) {
+  if (!href) return false;
+  return href.includes('youtube.com/watch')
+    || href.includes('youtu.be/')
+    || href.includes('vimeo.com/')
+    || href.includes('dvidshub.net/video');
+}
+
+/**
+ * Auto-blocks video URLs (DVIDS, YouTube, Vimeo) into video blocks
+ * @param {Element} main - The main container element
+ */
+function autoblockVideos(main) {
+  // Find all links that are video URLs and are the only content in their paragraph
+  main.querySelectorAll('a[href]').forEach((link) => {
+    if (!isVideoUrl(link.href)) return;
+
+    // Check if link is the only content in its paragraph (standalone video link)
+    const parent = link.parentElement;
+    if (parent?.tagName !== 'P') return;
+
+    // Check if the paragraph only contains this link (and maybe whitespace)
+    const textContent = parent.textContent.trim();
+    const linkText = link.textContent.trim();
+
+    // If the paragraph text equals the link text (or href), it's a standalone video link
+    if (textContent === linkText || textContent === link.href) {
+      // Create video block
+      const videoBlock = buildBlock('video', [[link.cloneNode(true)]]);
+      parent.replaceWith(videoBlock);
+    }
+  });
+
+  // Also check for plain text DVIDS URLs (not wrapped in anchor tags)
+  main.querySelectorAll('p').forEach((p) => {
+    // Skip if paragraph has children other than text nodes
+    if (p.querySelector('a, img, picture')) return;
+
+    const text = p.textContent.trim();
+    // Match DVIDS video URLs
+    const dvidsMatch = text.match(/^https?:\/\/(www\.)?dvidshub\.net\/video\/[^\s]+$/);
+    if (dvidsMatch) {
+      // Create a link element
+      const link = document.createElement('a');
+      link.href = text;
+      link.textContent = text;
+
+      // Create video block
+      const videoBlock = buildBlock('video', [[link]]);
+      p.replaceWith(videoBlock);
+    }
+  });
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
 function buildAutoBlocks(main) {
   try {
+    // Auto-block video URLs (DVIDS, YouTube, Vimeo)
+    autoblockVideos(main);
+
     // auto block `*/fragments/*` references
     const fragments = main.querySelectorAll('a[href*="/fragments/"]');
     if (fragments.length > 0) {
