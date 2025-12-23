@@ -270,7 +270,7 @@
 }
 
 .dynamic-cards.tiles .tile-link .usa-button:visited {
-  color: #fff;
+  color: var(--button-text-color, #fff);
 }
 
 /* TILES VARIANT: Responsive - Tablet */
