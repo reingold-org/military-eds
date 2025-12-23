@@ -82,7 +82,7 @@ Add the `autoplay` variant to automatically play the video when it comes into vi
 | --- | --- |
 | YouTube | `youtube.com/watch?v=ID` or `youtu.be/ID` |
 | Vimeo | `vimeo.com/ID` |
-| DVIDS | `dvidshub.net/video/ID` or `dvidshub.net/video/ID/title` |
+| DVIDS | `dvidshub.net/video/ID`, `dvidshub.net/video/ID/title`, or `dvidshub.net/video/video:ID` |
 | MP4 | Any URL ending in `.mp4` |
 | WebM | Any URL ending in `.webm` |
 
