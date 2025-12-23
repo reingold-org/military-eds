@@ -239,20 +239,24 @@ a:hover {
 /* buttons - Using USWDS styles (imported above) */
 
 /* Override USWDS button text color to use theme variable */
-.usa-button {
+.usa-button,
+a.usa-button:any-link {
   color: var(--button-text-color, #fff);
   background-color: var(--accent-color);
 }
 
-.usa-button:visited {
+.usa-button:visited,
+a.usa-button:visited {
   color: var(--button-text-color, #fff);
 }
 
-.usa-button:hover {
+.usa-button:hover,
+a.usa-button:hover {
   color: var(--button-text-color, #fff);
 }
 
-.usa-button:active {
+.usa-button:active,
+a.usa-button:active {
   color: var(--button-text-color, #fff);
 }
 
