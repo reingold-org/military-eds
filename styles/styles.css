@@ -238,11 +238,12 @@ a:hover {
 
 /* buttons - Using USWDS styles (imported above) */
 
-/* Override USWDS button text color to use theme variable */
+/* Override USWDS button styles to use theme variables */
 .usa-button,
 a.usa-button:any-link {
   color: var(--button-text-color, #fff);
   background-color: var(--accent-color);
+  cursor: pointer;
 }
 
 .usa-button:visited,
@@ -253,11 +254,59 @@ a.usa-button:visited {
 .usa-button:hover,
 a.usa-button:hover {
   color: var(--button-text-color, #fff);
+  background-color: var(--accent-color);
+  filter: brightness(0.85);
 }
 
 .usa-button:active,
 a.usa-button:active {
   color: var(--button-text-color, #fff);
+  background-color: var(--accent-color);
+  filter: brightness(0.7);
+}
+
+/* Secondary/Outline button styles */
+/* stylelint-disable selector-class-pattern */
+.usa-button--outline,
+a.usa-button--outline:any-link {
+  background-color: transparent;
+  box-shadow: inset 0 0 0 2px var(--accent-color);
+  color: var(--accent-color);
+}
+
+.usa-button--outline:visited,
+a.usa-button--outline:visited {
+  color: var(--accent-color);
+}
+
+.usa-button--outline:hover,
+a.usa-button--outline:hover {
+  background-color: transparent;
+  box-shadow: inset 0 0 0 2px var(--accent-color);
+  color: var(--accent-color);
+  filter: brightness(0.85);
+}
+
+.usa-button--outline:active,
+a.usa-button--outline:active {
+  background-color: transparent;
+  box-shadow: inset 0 0 0 2px var(--accent-color);
+  color: var(--accent-color);
+  filter: brightness(0.7);
+}
+/* stylelint-enable selector-class-pattern */
+
+/* Button group - multiple buttons side by side */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.button-group .usa-button {
+  width: auto;
+  margin-right: 0;
 }
 
 main img {

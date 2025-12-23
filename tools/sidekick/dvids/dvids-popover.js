@@ -16,7 +16,23 @@ const els = {
   next: document.getElementById('next'),
   grid: document.getElementById('grid'),
   status: document.getElementById('status'),
+  typeImage: document.getElementById('type-image'),
+  typeVideo: document.getElementById('type-video'),
 };
+
+// Get current media type
+function getMediaType() {
+  return els.typeVideo.checked ? 'video' : 'image';
+}
+
+// Update UI based on media type
+function updateMediaTypeUI() {
+  const isVideo = getMediaType() === 'video';
+  document.body.classList.toggle('video-mode', isVideo);
+  els.q.placeholder = isVideo
+    ? 'Search DVIDS videos (e.g., F-15, training, exercise)'
+    : 'Search DVIDS images (e.g., F-15, training, tank)';
+}
 
 function setStatus(text) {
   els.status.textContent = text;
@@ -27,9 +43,12 @@ function buildSearchUrl(params) {
   const u = new URL(API_BASE_SEARCH);
   const p = new URLSearchParams();
   p.set('api_key', API_KEY);
-  p.set('type[]', 'image');
+  p.set('type[]', params.mediaType || 'image');
   if (params.q) p.set('q', params.q);
-  if (params.aspect_ratio) p.set('aspect_ratio', params.aspect_ratio);
+  // Aspect ratio only applies to images
+  if (params.aspect_ratio && params.mediaType === 'image') {
+    p.set('aspect_ratio', params.aspect_ratio);
+  }
   if (params.branch) p.set('branch', params.branch);
   p.set('sort', params.sort || 'date');
   p.set('sortdir', params.sortdir || 'desc');
@@ -43,16 +62,19 @@ function buildSearchUrl(params) {
 
 async function search(pageOverride) {
   page = typeof pageOverride === 'number' ? pageOverride : page;
+  const mediaType = getMediaType();
   const params = {
     q: els.q.value.trim(),
     aspect_ratio: els.aspect.value,
     branch: els.branch.value,
     sort: els.sort.value,
     sortdir: els.sortdir.value,
+    mediaType,
     page,
   };
 
-  setStatus('Searching…');
+  const typeLabel = mediaType === 'video' ? 'videos' : 'images';
+  setStatus(`Searching ${typeLabel}…`);
   try {
     const url = buildSearchUrl(params);
     console.log('[SEARCH URL]', url);
@@ -62,27 +84,52 @@ async function search(pageOverride) {
 
     const results = Array.isArray(data.results) ? data.results : [];
     console.log('[SEARCH RESULTS]', results);
-    renderGrid(results);
-    setStatus(`Page ${page} — ${results.length} results`);
+    renderGrid(results, mediaType);
+    setStatus(`Page ${page} — ${results.length} ${typeLabel}`);
   } catch (e) {
     console.error('[SEARCH ERROR]', e);
     setStatus(`Error: ${e.message}`);
   }
 }
 
-function renderGrid(items) {
+function formatDuration(seconds) {
+  if (!seconds) return '';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+function renderGrid(items, mediaType = 'image') {
   els.grid.innerHTML = '';
   items.forEach((item) => {
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = mediaType === 'video' ? 'card video-card' : 'card';
+
     const img = document.createElement('img');
     img.src = item.thumbnail;
     img.alt = item.title || '';
+
     const meta = document.createElement('div');
     meta.className = 'meta';
     meta.textContent = item.title || '';
+
     card.append(img, meta);
-    card.addEventListener('click', () => onSelect(item, card));
+
+    // Add duration badge for videos
+    if (mediaType === 'video' && item.duration) {
+      const duration = document.createElement('span');
+      duration.className = 'duration';
+      duration.textContent = formatDuration(item.duration);
+      card.appendChild(duration);
+    }
+
+    card.addEventListener('click', () => {
+      if (mediaType === 'video') {
+        onSelectVideo(item, card);
+      } else {
+        onSelect(item, card);
+      }
+    });
     els.grid.appendChild(card);
   });
 }
@@ -187,11 +234,180 @@ function onSelect(item, card) {
   })();
 }
 
+// Handle video selection - show dialog with video URL
+function onSelectVideo(item, card) {
+  console.log('[VIDEO CLICK]', item.id, item);
+  setStatus('Fetching video details…');
+
+  (async () => {
+    try {
+      const assetUrl = `${API_BASE_ASSET}?id=${encodeURIComponent(item.id)}&api_key=${API_KEY}`;
+      console.log('[VIDEO ASSET URL]', assetUrl);
+      const res = await fetch(assetUrl, { headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error(`Asset API failed: ${res.status}`);
+      const data = await res.json();
+      console.log('[VIDEO ASSET DATA]', data);
+
+      const videoData = data.results;
+      if (!videoData) throw new Error('No video data found');
+
+      // Build the DVIDS video URL
+      const videoUrl = `https://www.dvidshub.net/video/${videoData.id}`;
+
+      showCopiedOverlay(card);
+      showVideoDialog(videoData, videoUrl);
+      setStatus('✅ Video selected');
+    } catch (err) {
+      console.error('[VIDEO SELECT ERROR]', err);
+      setStatus(`❌ Failed: ${err.message}`);
+    }
+  })();
+}
+
+// Show dialog with video URL for copying
+function showVideoDialog(videoData, videoUrl) {
+  const title = videoData.title || 'Untitled Video';
+  const description = videoData.description || videoData.caption || 'No description available';
+  const duration = formatDuration(videoData.duration);
+  const branch = videoData.branch || '';
+  const date = videoData.date || '';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'alt-text-dialog-overlay';
+  overlay.innerHTML = `
+    <div class="alt-text-dialog">
+      <div class="alt-text-dialog-header">
+        <h3>🎬 DVIDS Video</h3>
+        <button class="alt-text-dialog-close" aria-label="Close">×</button>
+      </div>
+      <div class="alt-text-dialog-body">
+        <p class="alt-text-label">Title:</p>
+        <div style="margin-bottom: 12px; font-size: 16px; font-weight: 500;">${title}</div>
+
+        <p class="alt-text-label">Video URL (for Video block):</p>
+        <input type="text" class="video-url-input" readonly value="${videoUrl}"
+          style="width: 100%; padding: 10px; border: 1px solid #555; border-radius: 6px; background: #1a1a1a; color: #fff; font-size: 14px; margin-bottom: 12px; box-sizing: border-box;" />
+
+        <p class="alt-text-label">Description:</p>
+        <textarea class="alt-text-content" readonly style="min-height: 80px;">${description}</textarea>
+
+        <div style="display: flex; gap: 16px; font-size: 12px; color: #888;">
+          ${duration ? `<span>⏱️ ${duration}</span>` : ''}
+          ${branch ? `<span>🎖️ ${branch}</span>` : ''}
+          ${date ? `<span>📅 ${date}</span>` : ''}
+          <span>ID: ${videoData.id}</span>
+        </div>
+      </div>
+      <div class="alt-text-dialog-footer">
+        <button class="copy-url-btn alt-text-copy-btn">Copy Video URL</button>
+        <button class="copy-desc-btn">Copy Description</button>
+        <button class="alt-text-close-btn">Close</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  const urlInput = overlay.querySelector('.video-url-input');
+  const closeDialog = () => overlay.remove();
+
+  // Close handlers
+  overlay.querySelector('.alt-text-dialog-close').addEventListener('click', closeDialog);
+  overlay.querySelector('.alt-text-close-btn').addEventListener('click', closeDialog);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeDialog();
+  });
+
+  // Select all on focus
+  urlInput.addEventListener('focus', () => urlInput.select());
+
+  // Copy URL button
+  overlay.querySelector('.copy-url-btn').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(videoUrl);
+      const btn = overlay.querySelector('.copy-url-btn');
+      btn.textContent = '✅ URL Copied!';
+      btn.disabled = true;
+      setStatus('✅ Video URL copied to clipboard');
+      console.log('[VIDEO URL COPIED]', videoUrl);
+
+      // Auto-close after a moment
+      setTimeout(() => {
+        closeDialog();
+        resetSearch();
+        closePalette();
+      }, 600);
+    } catch (err) {
+      console.error('[COPY URL ERROR]', err);
+      setStatus(`❌ Failed to copy: ${err.message}`);
+    }
+  });
+
+  // Copy description button
+  overlay.querySelector('.copy-desc-btn').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(description);
+      const btn = overlay.querySelector('.copy-desc-btn');
+      btn.textContent = '✅ Copied!';
+      btn.disabled = true;
+      setStatus('✅ Description copied');
+    } catch (err) {
+      console.error('[COPY DESC ERROR]', err);
+      setStatus(`❌ Failed to copy: ${err.message}`);
+    }
+  });
+
+  // Escape key to close
+  const escapeHandler = (e) => {
+    if (e.key === 'Escape') {
+      closeDialog();
+      document.removeEventListener('keydown', escapeHandler);
+    }
+  };
+  document.addEventListener('keydown', escapeHandler);
+}
+
+// Helper to reset search form
+function resetSearch() {
+  els.q.value = '';
+  els.aspect.value = '';
+  els.branch.value = '';
+  els.sort.value = 'date';
+  els.sortdir.value = 'desc';
+  els.grid.innerHTML = '';
+  page = 1;
+  setStatus('Idle');
+}
+
+// Helper to close the sidekick palette
+function closePalette() {
+  try {
+    chrome.runtime.sendMessage('igkmdomcgoebiipaifhmpfjhbjccggml', {
+      id: 'dvids-search',
+      action: 'closePalette',
+    });
+  } catch (e) {
+    console.log('[CLOSE PALETTE]', 'Extension not available');
+  }
+}
+
 // Wire UI
 els.search.addEventListener('click', () => search(1));
 els.next.addEventListener('click', () => search(page + 1));
 els.prev.addEventListener('click', () => search(Math.max(1, page - 1)));
 els.q.addEventListener('keydown', (e) => { if (e.key === 'Enter') search(1); });
+
+// Media type toggle handlers
+els.typeImage.addEventListener('change', () => {
+  updateMediaTypeUI();
+  els.grid.innerHTML = '';
+  setStatus('Idle - Image mode');
+});
+els.typeVideo.addEventListener('change', () => {
+  updateMediaTypeUI();
+  els.grid.innerHTML = '';
+  setStatus('Idle - Video mode');
+});
 
 function showAltTextDialog(assetId, assetData) {
   // Extract alt text from asset data (check multiple possible fields)
@@ -246,24 +462,9 @@ function showAltTextDialog(assetId, assetData) {
       
       // Close modal, reset search, and close palette
       setTimeout(() => {
-        // Close the modal overlay
         closeDialog();
-        
-        // Reset the search form
-        els.q.value = '';
-        els.aspect.value = '';
-        els.branch.value = '';
-        els.sort.value = 'date';
-        els.sortdir.value = 'desc';
-        els.grid.innerHTML = '';
-        page = 1;
-        setStatus('Idle');
-        
-        // Close the entire DVIDS palette
-        chrome.runtime.sendMessage('igkmdomcgoebiipaifhmpfjhbjccggml', {
-          id: 'dvids-search',
-          action: 'closePalette',
-        });
+        resetSearch();
+        closePalette();
       }, 500);
     } catch (err) {
       console.error('[COPY ALT TEXT ERROR]', err);
@@ -281,8 +482,9 @@ function showAltTextDialog(assetId, assetData) {
   document.addEventListener('keydown', escapeHandler);
 }
 
-// Initial focus
+// Initialize UI and focus
 setTimeout(() => {
+  updateMediaTypeUI();
   els.q.focus();
   window.focus();
   console.log('[INIT] document.hasFocus=', document.hasFocus());

@@ -6,7 +6,7 @@ Custom AEM Edge Delivery Services (EDS) Sidekick plugins for integrating with th
 
 | Plugin | Description | Use Case |
 |--------|-------------|----------|
-| **DVIDS Images** | Search and copy DVIDS images to clipboard | Adding military photos to documents |
+| **DVIDS Media** | Search and copy DVIDS images/videos | Adding military photos and videos to documents |
 | **DVIDS Articles** | Import DVIDS news articles with metadata | Creating news pages from DVIDS content |
 
 ## Installation
@@ -18,7 +18,7 @@ These plugins are configured in the Sidekick `config.json`:
   "plugins": [
     {
       "id": "dvids-search",
-      "title": "DVIDS Images",
+      "title": "DVIDS Media",
       "url": "/tools/sidekick/dvids/dvids-popover.html",
       "isPalette": true,
       "paletteRect": "right: 0; top: 0; bottom: 0; width: 380px;",
@@ -40,7 +40,7 @@ These plugins are configured in the Sidekick `config.json`:
 
 ---
 
-## DVIDS Images Plugin
+## DVIDS Media Plugin
 
 ### Files
 - `dvids-popover.html` - Plugin UI
@@ -48,27 +48,47 @@ These plugins are configured in the Sidekick `config.json`:
 
 ### Features
 
-- **Keyword Search** - Search DVIDS image library by keywords (e.g., "F-15", "training", "tank")
+- **Media Type Toggle** - Switch between searching for Images or Videos
+- **Keyword Search** - Search DVIDS media library by keywords (e.g., "F-15", "training", "tank")
 - **Filters**
-  - Aspect ratio (Landscape, Portrait, Square)
+  - Aspect ratio (Landscape, Portrait, Square) - Images only
   - Military branch (Army, Navy, Air Force, Marines, Coast Guard, Joint, Civilian)
   - Sort order (Date, Published, Updated, Relevance)
 - **Pagination** - Navigate through search results
-- **One-Click Copy** - Click an image to copy it to your clipboard
-- **Smart Resizing** - Automatically resizes large images to stay under clipboard size limits (4MB)
-- **Alt Text Dialog** - After copying, displays a dialog with the image's description/caption for accessibility
+- **Image Features**:
+  - One-click copy to clipboard
+  - Smart resizing (stays under 4MB clipboard limit)
+  - Alt text dialog with image description
+- **Video Features**:
+  - Video thumbnails with duration badges
+  - Play icon overlay
+  - Copy video URL for use with the Video block
 
 ### Usage
 
 1. Open the Sidekick while editing a document
-2. Click **DVIDS Images** to open the palette
-3. Enter search keywords and apply filters
-4. Click **Search**
-5. Click any image thumbnail to:
+2. Click **DVIDS Media** to open the palette
+3. **Select media type** - Toggle between **Images** (default) or **Videos**
+4. Enter search keywords and apply filters
+5. Click **Search**
+
+**For Images:**
+6. Click any image thumbnail to:
    - Copy the full-resolution image to your clipboard
    - View the alt text dialog with the image description
-6. Paste the image into your document (`Ctrl+V` / `Cmd+V`)
-7. Copy the alt text if needed for accessibility
+7. Paste the image into your document (`Ctrl+V` / `Cmd+V`)
+8. Copy the alt text if needed for accessibility
+
+**For Videos:**
+6. Click any video thumbnail to:
+   - View the video details dialog with title, description, and duration
+   - Copy the DVIDS video URL
+7. Use the copied URL in a **Video block** in your document:
+   ```
+   | Video |
+   | --- |
+   | https://www.dvidshub.net/video/123456 |
+   ```
 
 ### Technical Details
 

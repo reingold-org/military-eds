@@ -30,4 +30,9 @@
     flex: 1;
     order: unset;
   }
+
+  /* Sized variant - custom column widths */
+  .columns.sized > div > div {
+    flex: unset;
+  }
 }

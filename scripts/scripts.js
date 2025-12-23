@@ -19,6 +19,61 @@ import {
 import decorateArticle from '../templates/article/article.js';
 
 /**
+ * Decorates paragraphs with multiple links as button groups.
+ * @param {Element} element container element
+ */
+function decorateButtonGroups(element) {
+  element.querySelectorAll('p').forEach((p) => {
+    const links = p.querySelectorAll('a');
+    // Check if paragraph has multiple links and no images
+    if (links.length > 1 && !p.querySelector('img')) {
+      // Verify links are direct children or wrapped in strong/em
+      const validLinks = [...links].filter((a) => {
+        const parent = a.parentElement;
+        return parent === p || ((parent.tagName === 'STRONG' || parent.tagName === 'EM') && parent.parentElement === p);
+      });
+
+      if (validLinks.length > 1) {
+        p.classList.add('button-group');
+        validLinks.forEach((a) => {
+          a.title = a.title || a.textContent;
+          const parent = a.parentElement;
+          // Check if wrapped in strong (primary) or em (secondary)
+          if (parent.tagName === 'STRONG') {
+            a.className = 'button primary';
+          } else if (parent.tagName === 'EM') {
+            a.className = 'button secondary';
+            // Remove em wrapper, move link to paragraph
+            parent.replaceWith(a);
+          } else {
+            a.className = 'button';
+          }
+        });
+      }
+    }
+  });
+}
+
+/**
+ * Adds USWDS button class to decorated buttons for USWDS styling.
+ * @param {Element} element container element
+ */
+function decorateUSWDSButtons(element) {
+  element.querySelectorAll('a.button').forEach((button) => {
+    button.classList.add('usa-button');
+    // Add outline style for secondary buttons (italicized links)
+    if (button.classList.contains('secondary')) {
+      button.classList.add('usa-button--outline');
+      // Remove em wrapper if present
+      const parent = button.parentElement;
+      if (parent && parent.tagName === 'EM') {
+        parent.replaceWith(button);
+      }
+    }
+  });
+}
+
+/**
  * Sa11y Accessibility Checker - Sidekick Toggle Plugin
  * Injects/removes Sa11y when the Accessibility button is clicked.
  * https://sa11y.netlify.app/
@@ -233,6 +288,8 @@ function buildAutoBlocks(main) {
 export function decorateMain(main) {
   // hopefully forward compatible button decoration
   decorateButtons(main);
+  decorateButtonGroups(main);
+  decorateUSWDSButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
