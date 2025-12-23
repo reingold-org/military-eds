@@ -104,13 +104,23 @@ function stopSa11y() {
       delete window.sa11yInstance;
     }
 
-    // Remove all Sa11y elements
+    // Remove all Sa11y elements (by ID selector)
     [
       '#sa11y-injected-styles', '#sa11y-lang-script', '#sa11y-main-script',
       '#sa11y-container', '#sa11y-panel', '#sa11y-toast-container',
       '#sa11y-control-panel', '[id^="sa11y"]', '.sa11y-annotation', '.sa11y-instance',
     ].forEach((sel) => {
       document.querySelectorAll(sel).forEach((el) => {
+        try { el.remove(); } catch (e) { /* ignore */ }
+      });
+    });
+
+    // Remove Sa11y custom elements (web components with shadow DOM)
+    [
+      'sa11y-control-panel', 'sa11y-panel', 'sa11y-annotation',
+      'sa11y-heading-label', 'sa11y-heading-anchor', 'sa11y-tooltips',
+    ].forEach((tagName) => {
+      document.querySelectorAll(tagName).forEach((el) => {
         try { el.remove(); } catch (e) { /* ignore */ }
       });
     });
