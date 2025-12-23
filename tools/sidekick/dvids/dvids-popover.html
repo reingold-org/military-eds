@@ -13,10 +13,9 @@
     /* Media type toggle */
     .media-toggle { display: flex; gap: 0; border-radius: 6px; overflow: hidden; border: 1px solid #666; }
     .media-toggle input[type="radio"] { display: none; }
-    .media-toggle label { padding: 8px 16px; background: #222; color: #aaa; cursor: pointer; font-size: 13px; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+    .media-toggle label { padding: 8px 16px; background: #222; color: #aaa; cursor: pointer; font-size: 13px; transition: all 0.2s; }
     .media-toggle label:hover { background: #333; }
     .media-toggle input[type="radio"]:checked + label { background: #0066cc; color: #fff; }
-    .media-toggle .icon { font-size: 14px; }
     /* Hide aspect ratio when in video mode */
     body.video-mode #aspect { display: none; }
     .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -59,7 +58,11 @@
       border-radius: 4px;
       z-index: 3;
     }
-    .status { margin-top: 10px; font-size: 12px; opacity: 0.85; }
+    .status { font-size: 12px; opacity: 0.85; }
+    /* Pagination row */
+    .pagination { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #444; }
+    .pagination button { flex-shrink: 0; }
+    .pagination .status { flex: 1; text-align: center; margin: 0; }
     .copied-overlay {
   position: absolute;
   top: 0;
@@ -224,9 +227,9 @@
     <div class="row">
       <div class="media-toggle">
         <input type="radio" id="type-image" name="mediaType" value="image" checked />
-        <label for="type-image"><span class="icon">🖼️</span> Images</label>
+        <label for="type-image">Images</label>
         <input type="radio" id="type-video" name="mediaType" value="video" />
-        <label for="type-video"><span class="icon">🎬</span> Videos</label>
+        <label for="type-video">Videos</label>
       </div>
       <input id="q" type="text" placeholder="Search DVIDS (e.g., F-15, training, tank)" style="flex: 1;" />
       <button id="search">Search</button>
@@ -258,11 +261,13 @@
         <option value="desc">Desc</option>
         <option value="asc">Asc</option>
       </select>
-      <button id="prev">Prev</button>
-      <button id="next">Next</button>
     </div>
     <div id="grid" class="grid"></div>
-    <div id="status" class="status">Idle</div>
+    <div class="pagination">
+      <button id="prev">← Prev</button>
+      <div id="status" class="status">Idle</div>
+      <button id="next">Next →</button>
+    </div>
   </div>
   <script src="./dvids-popover.js" type="module"></script>
 </body>
