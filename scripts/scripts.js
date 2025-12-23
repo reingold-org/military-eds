@@ -110,7 +110,9 @@ function stopSa11y() {
       '#sa11y-container', '#sa11y-panel', '#sa11y-toast-container',
       '#sa11y-control-panel', '[id^="sa11y"]', '.sa11y-annotation', '.sa11y-instance',
     ].forEach((sel) => {
-      document.querySelectorAll(sel).forEach((el) => { try { el.remove(); } catch (e) { /* ignore */ } });
+      document.querySelectorAll(sel).forEach((el) => {
+        try { el.remove(); } catch (e) { /* ignore */ }
+      });
     });
 
     delete window.Sa11y;
