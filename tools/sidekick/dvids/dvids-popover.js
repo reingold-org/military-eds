@@ -1,6 +1,6 @@
 const API_BASE_SEARCH = 'https://api.dvidshub.net/search';
 const API_BASE_ASSET = 'https://api.dvidshub.net/asset';
-const API_KEY = 'key-6911edd214ab0'; // keep secret; consider a proxy for production.
+const API_KEY = 'key-695e739e5c0a6'; // keep secret; consider a proxy for production.
 const MAX_RESULTS = 20;
 
 let page = 1;
@@ -177,17 +177,17 @@ function onSelect(item, card) {
 
       // Start with reasonable max dimension based on original size
       let maxDimension = Math.max(targetWidth, targetHeight) > 4096 ? 4096 : Math.max(targetWidth, targetHeight);
-      
+
       while (attempt < 5) {
         attempt++;
-        
+
         // Calculate scaled dimensions
         if (targetWidth > maxDimension || targetHeight > maxDimension) {
           const ratio = Math.min(maxDimension / targetWidth, maxDimension / targetHeight);
           targetWidth = Math.floor(img.naturalWidth * ratio);
           targetHeight = Math.floor(img.naturalHeight * ratio);
         }
-        
+
         console.log(`[ATTEMPT ${attempt}]`, `${targetWidth}x${targetHeight} (max: ${maxDimension})`);
         setStatus(`Processing image ${targetWidth}x${targetHeight}...`);
 
@@ -200,12 +200,12 @@ function onSelect(item, card) {
         blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         const sizeMB = blob.size / 1024 / 1024;
         console.log(`[BLOB SIZE]`, `${sizeMB.toFixed(2)} MB`);
-        
+
         if (blob.size <= MAX_BLOB_SIZE || maxDimension <= 512) {
           // Success or we've scaled down as much as reasonable
           break;
         }
-        
+
         // Reduce dimensions by 30% for next attempt
         maxDimension = Math.floor(maxDimension * 0.7);
         targetWidth = img.naturalWidth;
@@ -422,14 +422,14 @@ els.typeVideo.addEventListener('change', () => {
 
 function showAltTextDialog(assetId, assetData) {
   // Extract alt text from asset data (check multiple possible fields)
-  const altText = assetData?.description || 
-                  assetData?.caption || 
-                  assetData?.title || 
+  const altText = assetData?.description ||
+                  assetData?.caption ||
+                  assetData?.title ||
                   assetData?.alt_text ||
                   'No description available';
-  
+
   console.log('[ALT TEXT]', altText);
-  
+
   // Create dialog overlay
   const overlay = document.createElement('div');
   overlay.className = 'alt-text-dialog-overlay';
@@ -450,9 +450,9 @@ function showAltTextDialog(assetId, assetData) {
       </div>
     </div>
   `;
-  
+
   document.body.appendChild(overlay);
-  
+
   // Close handlers
   const closeDialog = () => overlay.remove();
   overlay.querySelector('.alt-text-dialog-close').addEventListener('click', closeDialog);
@@ -460,7 +460,7 @@ function showAltTextDialog(assetId, assetData) {
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) closeDialog();
   });
-  
+
   // Copy button handler
   overlay.querySelector('.alt-text-copy-btn').addEventListener('click', async () => {
     try {
@@ -470,7 +470,7 @@ function showAltTextDialog(assetId, assetData) {
       copyBtn.disabled = true;
       console.log('[ALT TEXT COPIED]', altText.substring(0, 100));
       setStatus('✅ Alt text copied to clipboard');
-      
+
       // Close modal, reset search, and close palette
       setTimeout(() => {
         closeDialog();
@@ -482,7 +482,7 @@ function showAltTextDialog(assetId, assetData) {
       setStatus(`❌ Failed to copy alt text: ${err.message}`);
     }
   });
-  
+
   // Escape key to close
   const escapeHandler = (e) => {
     if (e.key === 'Escape') {

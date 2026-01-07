@@ -5,7 +5,7 @@
 
 const API_BASE_SEARCH = 'https://api.dvidshub.net/search';
 const API_BASE_ASSET = 'https://api.dvidshub.net/asset';
-const API_KEY = 'key-6911edd214ab0'; // consider a proxy for production
+const API_KEY = 'key-695e739e5c0a6'; // consider a proxy for production
 const MAX_RESULTS = 15;
 
 let page = 1;
@@ -86,7 +86,7 @@ async function search(pageOverride) {
   }
 
   setStatus('Searching DVIDS…');
-  
+
   try {
     const url = buildSearchUrl(params);
     console.log('[SEARCH URL]', url);
@@ -97,7 +97,7 @@ async function search(pageOverride) {
     const results = Array.isArray(data.results) ? data.results : [];
     console.log('[SEARCH RESULTS]', results.length, 'articles');
     renderArticleList(results);
-    
+
     const totalPages = data.page_count || 1;
     setStatus(`Page ${page} of ${totalPages} — ${data.total_results || results.length} total articles`);
   } catch (e) {
@@ -111,12 +111,12 @@ async function search(pageOverride) {
  */
 function renderArticleList(items) {
   els.articles.innerHTML = '';
-  
+
   if (items.length === 0) {
     els.articles.innerHTML = '<p style="color:#888;text-align:center;padding:20px;">No articles found. Try different search terms.</p>';
     return;
   }
-  
+
   items.forEach((item, idx) => {
     // Debug: log first item to see field structure
     if (idx === 0) {
@@ -130,48 +130,48 @@ function renderArticleList(items) {
         short_title: item.short_title,
       });
     }
-    
+
     const card = document.createElement('div');
     card.className = 'article-card';
-    
+
     // Thumbnail
     const img = document.createElement('img');
     img.className = 'thumb';
     img.src = item.thumbnail || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80"><rect fill="%23333" width="120" height="80"/><text x="60" y="45" fill="%23666" text-anchor="middle" font-size="12">No Image</text></svg>';
     img.alt = extractStringValue(item.title) || '';
-    
+
     // Info container
     const info = document.createElement('div');
     info.className = 'info';
-    
+
     // Extract title - try multiple possible field names
-    const titleText = extractStringValue(item.title) 
-      || item.headline 
-      || item.name 
+    const titleText = extractStringValue(item.title)
+      || item.headline
+      || item.name
       || item.short_title
       || 'Untitled';
-    
+
     if (idx === 0) {
       console.log('[TITLE EXTRACTED]', titleText);
     }
-    
+
     const title = document.createElement('p');
     title.className = 'article-title';
     title.textContent = titleText;
     console.log('[TITLE ELEMENT]', title.outerHTML); // Debug: see the actual HTML
-    
+
     const meta = document.createElement('p');
     meta.className = 'meta';
     const datePart = formatDate(item.date);
     const branchPart = item.branch || '';
     meta.textContent = [datePart, branchPart].filter(Boolean).join(' • ');
-    
+
     info.appendChild(title);
     info.appendChild(meta);
-    
+
     card.appendChild(img);
     card.appendChild(info);
-    
+
     card.addEventListener('click', () => onSelectArticle(item, card));
     els.articles.appendChild(card);
   });
@@ -183,7 +183,7 @@ function renderArticleList(items) {
 async function onSelectArticle(item, card) {
   console.log('[SELECT]', item.id, item.title);
   console.log('[SEARCH ITEM]', item); // Log search result to see all fields
-  
+
   // Check for image-related fields in search result
   console.log('[SEARCH ITEM IMAGE FIELDS]', {
     thumbnail: item.thumbnail,
@@ -193,29 +193,29 @@ async function onSelectArticle(item, card) {
     featured_image: item.featured_image,
     asset_id: item.asset_id,
   });
-  
+
   // Visual feedback
   document.querySelectorAll('.article-card').forEach(c => c.classList.remove('selected'));
   card.classList.add('selected');
-  
+
   setStatus('Fetching full article…');
-  
+
   try {
     const assetUrl = `${API_BASE_ASSET}?id=${encodeURIComponent(item.id)}&api_key=${API_KEY}`;
     console.log('[ASSET URL]', assetUrl);
     const res = await fetch(assetUrl, { headers: { Accept: 'application/json' } });
     if (!res.ok) throw new Error(`Asset API failed: ${res.status}`);
     const data = await res.json();
-    
+
     const article = data.results;
     if (!article) throw new Error('No article data returned');
-    
+
     // Try to get full-resolution image
     let fullImageUrl = null;
-    
+
     // First check for explicit image ID fields
     let imageId = item.image_id || item.photo_id || article.image_id || article.photo_id;
-    
+
     // If no explicit ID, try to extract from thumbnail URL
     // Thumbnail URLs look like: https://d1ldvf68ux039x.cloudfront.net/thumbs/photos/2512/9437429/122x92_q95.jpg
     // The asset ID is in the path: /thumbs/photos/YYMM/ASSET_ID/filename.jpg
@@ -226,7 +226,7 @@ async function onSelectArticle(item, card) {
         console.log('[IMAGE] Extracted asset ID from thumbnail URL:', imageId);
       }
     }
-    
+
     if (imageId) {
       // Fetch the full image from asset API (like dvids-popover.js does)
       // DVIDS API expects format: type:id (e.g., "image:9442265")
@@ -249,7 +249,7 @@ async function onSelectArticle(item, card) {
         console.log('[IMAGE] Failed to fetch full image:', imgErr.message);
       }
     }
-    
+
     // Use full image URL, or fall back to thumbnail from search result
     if (fullImageUrl) {
       article.image = fullImageUrl;
@@ -258,14 +258,14 @@ async function onSelectArticle(item, card) {
       article.image = item.thumbnail;
       console.log('[IMAGE] Falling back to thumbnail:', item.thumbnail);
     }
-    
+
     console.log('[ARTICLE WITH IMAGE]', {
       title: article.title,
       image: article.image,
       credit: article.credit,
       location: article.location,
     });
-    
+
     showPreviewDialog(article);
     setStatus('Article loaded - review and copy to clipboard');
   } catch (err) {
@@ -280,12 +280,12 @@ async function onSelectArticle(item, card) {
 function showPreviewDialog(article) {
   const overlay = document.createElement('div');
   overlay.className = 'preview-dialog-overlay';
-  
+
   // Build preview content
-  const bodyPreview = article.body 
+  const bodyPreview = article.body
     ? article.body.replace(/<[^>]*>/g, ' ').substring(0, 500) + '...'
     : 'No body content';
-  
+
   overlay.innerHTML = `
     <div class="preview-dialog">
       <div class="preview-dialog-header">
@@ -297,7 +297,7 @@ function showPreviewDialog(article) {
           <div class="preview-section-label">Title</div>
           <p class="preview-title">${escapeHtml(article.title || 'Untitled')}</p>
         </div>
-        
+
         <div class="preview-section">
           <div class="preview-section-label">Metadata</div>
           <div class="preview-meta">
@@ -307,19 +307,19 @@ function showPreviewDialog(article) {
             <strong>Unit:</strong> ${extractStringValue(article.unit_name) || 'N/A'}
           </div>
         </div>
-        
+
         ${article.image ? `
         <div class="preview-section">
           <div class="preview-section-label">Featured Image</div>
           <img class="preview-image" src="${article.image}" alt="${escapeHtml(article.title || '')}">
         </div>
         ` : ''}
-        
+
         <div class="preview-section">
           <div class="preview-section-label">Body Preview</div>
           <div class="preview-body">${escapeHtml(bodyPreview)}</div>
         </div>
-        
+
         <div class="preview-section">
           <div class="preview-section-label">Metadata Block (will be added)</div>
           <div class="preview-metadata">
@@ -341,9 +341,9 @@ function showPreviewDialog(article) {
       </div>
     </div>
   `;
-  
+
   document.body.appendChild(overlay);
-  
+
   // Close handlers
   const closeDialog = () => overlay.remove();
   overlay.querySelector('.preview-dialog-close').addEventListener('click', closeDialog);
@@ -351,7 +351,7 @@ function showPreviewDialog(article) {
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) closeDialog();
   });
-  
+
   // Escape to close
   const escapeHandler = (e) => {
     if (e.key === 'Escape') {
@@ -360,7 +360,7 @@ function showPreviewDialog(article) {
     }
   };
   document.addEventListener('keydown', escapeHandler);
-  
+
   // Copy button
   overlay.querySelector('.btn-copy').addEventListener('click', async () => {
     await copyArticleToClipboard(article, overlay);
@@ -397,14 +397,14 @@ function formatKeywords(keywords) {
 function extractStringValue(field) {
   if (!field) return '';
   if (typeof field === 'string') return field;
-  
+
   // Handle arrays (like credit which is [{name: "John Doe", ...}])
   if (Array.isArray(field)) {
     if (field.length === 0) return '';
     // Get first element and extract from it
     return extractStringValue(field[0]);
   }
-  
+
   if (typeof field === 'object') {
     // Try common property names
     if (field.name) return field.name;
@@ -452,27 +452,27 @@ function formatLocation(location) {
  */
 function stripDatelineFromBody(body) {
   if (!body) return '';
-  
+
   // Common dateline patterns:
   // "FORT BRAGG, N.C. — Content..."
   // "WASHINGTON — Content..."
   // "GRAFENWOEHR, Germany — Content..."
   // Can be at start of body or inside first <p> tag
-  
+
   // Pattern: Start of string or after opening p tag, then ALLCAPS location, then em-dash or double-dash
   // Em-dash: — (HTML entity or character)
   // Also handle regular dashes: -- or –
-  
+
   const datelinePattern = /^(\s*<p[^>]*>)?\s*[A-Z][A-Z\s,.\-']+\s*[—–\-]{1,2}\s*/i;
-  
+
   let cleaned = body;
-  
+
   // Check if body starts with a dateline pattern
   if (datelinePattern.test(cleaned)) {
     cleaned = cleaned.replace(datelinePattern, '$1');
     console.log('[DATELINE] Stripped dateline from body');
   }
-  
+
   return cleaned;
 }
 
@@ -486,7 +486,7 @@ function generateArticleHtml(article, imageData = null) {
   // Clean up body content - DVIDS returns HTML
   // Remove dateline from body since it's added via metadata
   let bodyHtml = stripDatelineFromBody(article.body || '');
-  
+
   // Build hero image HTML with embedded base64 or fallback to URL
   let heroImageHtml = '';
   if (imageData && imageData.dataUrl) {
@@ -494,10 +494,10 @@ function generateArticleHtml(article, imageData = null) {
   } else if (article.image) {
     heroImageHtml = `<p><img src="${article.image}" alt="${escapeHtml(article.title || '')}" width="600"></p>`;
   }
-  
+
   // Build the full article HTML structure for Word
   // Word needs explicit table borders and styling to render tables properly
-  
+
   // Build the image for metadata table (smaller version)
   let metaImageHtml = '';
   if (imageData && imageData.dataUrl) {
@@ -506,7 +506,7 @@ function generateArticleHtml(article, imageData = null) {
   } else if (article.image) {
     metaImageHtml = `<img src="${article.image}" alt="" width="200">`;
   }
-  
+
   const html = `<!DOCTYPE html>
 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
 <head>
@@ -581,7 +581,7 @@ ${bodyHtml}
 
 </body>
 </html>`;
-  
+
   return html;
 }
 
@@ -594,37 +594,37 @@ async function imageToBase64(imageUrl) {
     console.log('[IMAGE] No image URL provided');
     return null;
   }
-  
+
   console.log('[IMAGE] Loading:', imageUrl);
-  
+
   try {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.src = imageUrl;
-    
+
     // Use decode() like the working image popover does
     await img.decode();
-    
+
     console.log('[IMAGE] Decoded:', img.naturalWidth, 'x', img.naturalHeight);
-    
+
     let width = img.naturalWidth;
     let height = img.naturalHeight;
     const maxWidth = 800;
-    
+
     if (width > maxWidth) {
       height = Math.round((height * maxWidth) / width);
       width = maxWidth;
     }
-    
+
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0, width, height);
-    
+
     const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
     console.log('[IMAGE] Converted to base64:', Math.round(dataUrl.length / 1024), 'KB');
-    
+
     return { dataUrl, width, height };
   } catch (err) {
     console.error('[IMAGE] Failed to load:', err);
@@ -641,7 +641,7 @@ async function copyArticleToClipboard(article, overlay) {
   const copyBtn = overlay.querySelector('.btn-copy');
   copyBtn.disabled = true;
   copyBtn.textContent = 'Loading image…';
-  
+
   try {
     // Convert hero image to base64 for embedding
     // Check multiple possible image fields from DVIDS
@@ -652,38 +652,38 @@ async function copyArticleToClipboard(article, overlay) {
       thumbnail: article.thumbnail,
       thumb_url: article.thumb_url,
     });
-    
+
     let imageData = null;
     if (imageUrl) {
       imageData = await imageToBase64(imageUrl);
     }
-    
+
     copyBtn.textContent = 'Copying…';
-    
+
     const html = generateArticleHtml(article, imageData);
     console.log('[GENERATED HTML]', html.substring(0, 1000) + '...');
     console.log('[HTML LENGTH]', html.length, 'characters');
-    
+
     // Use ClipboardItem for HTML content
     // Only include text/html to force Word to use the rich format
     const blob = new Blob([html], { type: 'text/html' });
-    
+
     await navigator.clipboard.write([
       new ClipboardItem({
         'text/html': blob,
       }),
     ]);
-    
+
     console.log('[CLIPBOARD] HTML written successfully');
-    
+
     console.log('[CLIPBOARD SUCCESS]');
     copyBtn.textContent = '✅ Copied!';
     setStatus('✅ Article copied to clipboard! Paste into a blank Word document.');
-    
+
     // Close after short delay
     setTimeout(() => {
       overlay.remove();
-      
+
       // Reset search
       els.q.value = '';
       els.branch.value = '';
@@ -692,7 +692,7 @@ async function copyArticleToClipboard(article, overlay) {
       els.articles.innerHTML = '';
       page = 1;
       setStatus('Article copied! Open a blank Word document and paste (Ctrl+V / Cmd+V)');
-      
+
       // Close the Sidekick palette
       try {
         chrome.runtime.sendMessage('igkmdomcgoebiipaifhmpfjhbjccggml', {
@@ -703,7 +703,7 @@ async function copyArticleToClipboard(article, overlay) {
         console.log('[CLOSE PALETTE] Not in Sidekick context');
       }
     }, 1000);
-    
+
   } catch (err) {
     console.error('[CLIPBOARD ERROR]', err);
     copyBtn.disabled = false;
