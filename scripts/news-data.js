@@ -1,4 +1,55 @@
 /**
+ * Resolve a relative URL to an absolute URL using a base origin
+ * @param {string} url - URL to resolve (may be relative or absolute)
+ * @param {string} baseOrigin - Origin to use for relative URLs (e.g., 'https://other-site.mil')
+ * @returns {string} Absolute URL
+ */
+function resolveUrl(url, baseOrigin) {
+  if (!url) return url;
+  // Already absolute URL
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  // Relative URL - prefix with base origin
+  return `${baseOrigin}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
+/**
+ * Fetch articles from a single source
+ * @param {string} source - URL to fetch from
+ * @returns {Promise<Array>} Array of articles or empty array on error
+ */
+async function fetchFromSource(source) {
+  try {
+    const response = await fetch(source);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch from ${source}: ${response.status}`);
+    }
+    const data = await response.json();
+    let articles = data.data || [];
+
+    // Check if source is external (different origin)
+    const sourceUrl = new URL(source, window.location.origin);
+    const isExternal = sourceUrl.origin !== window.location.origin;
+
+    // Resolve relative URLs for external sources
+    if (isExternal) {
+      articles = articles.map((article) => ({
+        ...article,
+        path: resolveUrl(article.path, sourceUrl.origin),
+        image: resolveUrl(article.image, sourceUrl.origin),
+      }));
+    }
+
+    return articles;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`Error fetching from ${source}:`, error);
+    return [];
+  }
+}
+
+/**
  * Shared utility for fetching and filtering news articles
  * @param {Object} filterOptions - Options for filtering articles
  * @param {boolean} filterOptions.featured - Filter for featured articles only
@@ -7,17 +58,21 @@
  * @param {string} filterOptions.category - Filter by category
  * @param {string} filterOptions.tag - Filter by tag
  * @param {Array<string>} filterOptions.excludePaths - Array of article paths to exclude
+ * @param {Array<string>} filterOptions.sources - Array of source URLs to fetch from
  * @returns {Promise<Array>} Array of article objects
  */
 export async function fetchNewsArticles(filterOptions = {}) {
   try {
-    const response = await fetch('/news/query-index.json');
-    if (!response.ok) {
-      throw new Error(`Failed to fetch articles: ${response.status}`);
-    }
+    // Determine sources to fetch from
+    const sources = filterOptions.sources && filterOptions.sources.length > 0
+      ? filterOptions.sources
+      : ['/news/query-index.json'];
 
-    const data = await response.json();
-    let articles = data.data || [];
+    // Fetch from all sources in parallel
+    const results = await Promise.all(sources.map((source) => fetchFromSource(source)));
+
+    // Merge all results into single array
+    let articles = results.flat();
 
     // Apply filters
     if (filterOptions.featured) {

@@ -124,6 +124,7 @@ function readBlockConfig(block) {
     limit: 6,
     featured: false,
     sortBy: 'releaseDate',
+    sources: [],
   };
 
   const rows = block.querySelectorAll(':scope > div');
@@ -141,6 +142,12 @@ function readBlockConfig(block) {
         config.category = value;
       } else if (key === 'tag') {
         config.tag = value;
+      } else if (key === 'source') {
+        const link = cells[1].querySelector('a');
+        const sourceUrl = link ? link.href : value;
+        if (sourceUrl) {
+          config.sources.push(sourceUrl);
+        }
       }
     }
   });
