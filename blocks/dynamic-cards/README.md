@@ -80,6 +80,25 @@ Add `(tiles)` after the block name:
 | `featured` | boolean | false   | Show only featured articles (`true`/`false`)   |
 | `category` | string  | -       | Filter by specific category                    |
 | `tag`      | string  | -       | Filter by specific tag                         |
+| `source`   | URL     | `/news/query-index.json` | Index source URL (multiple allowed) |
+
+### Multiple Sources
+
+You can specify one or more index sources. Articles from all sources are merged and sorted together by release date.
+
+```
+| Dynamic Cards         |
+| source     | /news/query-index.json |
+| source     | https://other-site.mil/articles/query-index.json |
+| limit      | 6 |
+```
+
+**Notes:**
+- If no `source` is specified, defaults to `/news/query-index.json`
+- Multiple `source` rows are supported - all sources are fetched in parallel
+- Sources can be relative paths or full URLs with domain
+- Cross-domain sources require proper CORS headers on the remote server
+- If a source fails to load, articles from other sources will still display
 
 ## Variants
 
