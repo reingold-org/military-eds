@@ -314,7 +314,7 @@ main {
   z-index: 1;
 }
 
-main > div {
+main > div:not(:empty) {
   margin: 40px 16px;
 }
 
