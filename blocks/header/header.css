@@ -162,7 +162,8 @@ header .nav-brand {
 header nav .nav-brand img {
   width: auto;
   height: auto;
-  max-height: 116;
+  max-height: 116px;
+  max-width: 350px;
 }
 
 /* Adjust logo size on mobile */
