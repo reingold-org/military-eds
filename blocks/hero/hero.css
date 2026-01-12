@@ -86,64 +86,49 @@
 }
 
 /* ==========================================================================
-   MARINES FULLSCREEN HERO VARIANT
-   - Full viewport height image
-   - Extends behind transparent navigation
-   - Simple, no carousel
+   FULLSCREEN HERO VARIANT - SHARED BASE STYLES
+   Used by: Marines, Air Force, and other themes
 
    DOM Structure:
    .section.hero-container
      .hero-wrapper
        .hero.fullscreen.block
-         > div (content wrapper with AOS)
+         > div (content wrapper)
            > div (inner content)
              h1
              p > picture > img (hero image)
    ========================================================================== */
 
-/* Hero container - remove margins */
-body.marines .section.hero-container {
+/* Hero container - remove margins (Marines & Air Force) */
+body.marines .section.hero-container,
+body.airforce .section.hero-container {
   margin: 0;
   padding: 0;
 }
 
-/* Hero wrapper - full width, no border */
-body.marines .hero-container .hero-wrapper {
+/* Hero wrapper - full width, no border (Marines & Air Force) */
+body.marines .hero-container .hero-wrapper,
+body.airforce .hero-container .hero-wrapper {
   max-width: unset;
   padding: 0;
   border-bottom: none;
 }
 
-/* Main hero block - fullscreen */
-body.marines .hero.fullscreen {
+/* Main hero block - fullscreen (Marines & Air Force) */
+body.marines .hero.fullscreen,
+body.airforce .hero.fullscreen {
   position: relative;
   height: 100vh;
   height: 100dvh;
   min-height: 880px;
   margin-top: calc(var(--nav-height) * -1);
   padding: 0;
-  background-color: #000;
   overflow: hidden;
 }
 
-/* Dark gradient overlay - for text readability */
-body.marines .hero.fullscreen > div > div::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.6) 0%,
-    rgba(0, 0, 0, 0.3) 30%,
-    rgba(0, 0, 0, 0.4) 70%,
-    rgba(0, 0, 0, 0.7) 100%
-  );
-  z-index: -1;
-  pointer-events: none;
-}
-
-/* Content wrapper (first div inside hero) - centers content */
-body.marines .hero.fullscreen > div {
+/* Content wrapper - centers content (Marines & Air Force) */
+body.marines .hero.fullscreen > div,
+body.airforce .hero.fullscreen > div {
   position: absolute;
   inset: 0;
   z-index: 3;
@@ -153,27 +138,38 @@ body.marines .hero.fullscreen > div {
   padding-top: var(--nav-height);
 }
 
-/* Inner content div */
-body.marines .hero.fullscreen > div > div {
+/* Inner content div (Marines & Air Force) */
+body.marines .hero.fullscreen > div > div,
+body.airforce .hero.fullscreen > div > div {
   text-align: center;
   max-width: 900px;
   padding: 40px 24px;
   z-index: 5;
 }
 
-/* Accent bar above title */
-body.marines .hero.fullscreen > div > div::before {
+/* Dark gradient overlay - for text readability (Marines & Air Force) */
+body.marines .hero.fullscreen > div > div::after,
+body.airforce .hero.fullscreen > div > div::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Accent bar above title (Marines & Air Force) */
+body.marines .hero.fullscreen > div > div::before,
+body.airforce .hero.fullscreen > div > div::before {
   content: '';
   display: block;
   width: 80px;
   height: 3px;
-  background-color: var(--marines-scarlet);
   margin: 0 auto 24px;
 }
 
-/* Heading */
-body.marines .hero.fullscreen h1 {
-  font-family: var(--marines-heading-font);
+/* Heading (Marines & Air Force) */
+body.marines .hero.fullscreen h1,
+body.airforce .hero.fullscreen h1 {
   color: #fff;
   font-size: 32px;
   line-height: 1.15;
@@ -183,25 +179,25 @@ body.marines .hero.fullscreen h1 {
   max-width: none;
 }
 
-body.marines .hero.fullscreen h1::after {
+body.marines .hero.fullscreen h1::after,
+body.airforce .hero.fullscreen h1::after {
   display: none;
 }
 
-/* The paragraph containing the picture - position absolutely on the hero block */
-body.marines .hero.fullscreen p:has(picture) {
+/* Picture paragraph - position absolutely (Marines & Air Force) */
+body.marines .hero.fullscreen p:has(picture),
+body.airforce .hero.fullscreen p:has(picture) {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   margin: 0;
   padding: 0;
   z-index: -1;
   max-width: none;
 }
 
-/* Picture element - fill parent */
-body.marines .hero.fullscreen picture {
+/* Picture element - fill parent (Marines & Air Force) */
+body.marines .hero.fullscreen picture,
+body.airforce .hero.fullscreen picture {
   position: absolute;
   top: 0;
   left: 0;
@@ -210,13 +206,15 @@ body.marines .hero.fullscreen picture {
   display: block;
 }
 
-/* Remove any default picture pseudo-element */
-body.marines .hero.fullscreen picture::before {
+/* Remove default picture pseudo-element (Marines & Air Force) */
+body.marines .hero.fullscreen picture::before,
+body.airforce .hero.fullscreen picture::before {
   display: none;
 }
 
-/* Image - cover the entire hero area */
-body.marines .hero.fullscreen img {
+/* Image - cover entire hero area (Marines & Air Force) */
+body.marines .hero.fullscreen img,
+body.airforce .hero.fullscreen img {
   position: absolute;
   top: 0;
   left: 0;
@@ -226,8 +224,9 @@ body.marines .hero.fullscreen img {
   object-position: center;
 }
 
-/* Text paragraphs (not the one with picture) */
-body.marines .hero.fullscreen > div > div > p:not(:has(picture)) {
+/* Text paragraphs (Marines & Air Force) */
+body.marines .hero.fullscreen > div > div > p:not(:has(picture)),
+body.airforce .hero.fullscreen > div > div > p:not(:has(picture)) {
   color: rgb(255 255 255 / 85%);
   font-size: 16px;
   line-height: 1.6;
@@ -238,14 +237,85 @@ body.marines .hero.fullscreen > div > div > p:not(:has(picture)) {
   z-index: 5;
 }
 
-/* Buttons */
+/* Buttons (Marines & Air Force) */
 body.marines .hero.fullscreen .button,
-body.marines .hero.fullscreen .usa-button {
+body.marines .hero.fullscreen .usa-button,
+body.airforce .hero.fullscreen .button,
+body.airforce .hero.fullscreen .usa-button {
   margin-top: 24px;
-  background-color: var(--marines-scarlet);
-  border-color: var(--marines-scarlet);
   position: relative;
   z-index: 5;
+}
+
+/* Desktop shared styles (Marines & Air Force) */
+@media (width >= 900px) {
+  body.marines .hero.fullscreen > div > div,
+  body.airforce .hero.fullscreen > div > div {
+    padding: 60px 32px;
+  }
+
+  body.marines .hero.fullscreen > div > div::before,
+  body.airforce .hero.fullscreen > div > div::before {
+    width: 100px;
+    margin-bottom: 32px;
+  }
+
+  body.marines .hero.fullscreen h1,
+  body.airforce .hero.fullscreen h1 {
+    font-size: 48px;
+    letter-spacing: 3px;
+  }
+
+  body.marines .hero.fullscreen > div > div > p:not(:has(picture)),
+  body.airforce .hero.fullscreen > div > div > p:not(:has(picture)) {
+    font-size: 18px;
+    max-width: 600px;
+  }
+}
+
+/* Large desktop shared styles (Marines & Air Force) */
+@media (width >= 1200px) {
+  body.marines .hero.fullscreen h1,
+  body.airforce .hero.fullscreen h1 {
+    font-size: 56px;
+  }
+}
+
+/* ==========================================================================
+   MARINES THEME-SPECIFIC OVERRIDES
+   ========================================================================== */
+
+/* Marines background color */
+body.marines .hero.fullscreen {
+  background-color: #000;
+}
+
+/* Marines gradient overlay */
+body.marines .hero.fullscreen > div > div::after {
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 60%) 0%,
+    rgb(0 0 0 / 30%) 30%,
+    rgb(0 0 0 / 40%) 70%,
+    rgb(0 0 0 / 70%) 100%
+  );
+}
+
+/* Marines accent bar color */
+body.marines .hero.fullscreen > div > div::before {
+  background-color: var(--marines-scarlet);
+}
+
+/* Marines heading font */
+body.marines .hero.fullscreen h1 {
+  font-family: var(--marines-heading-font);
+}
+
+/* Marines button colors */
+body.marines .hero.fullscreen .button,
+body.marines .hero.fullscreen .usa-button {
+  background-color: var(--marines-scarlet);
+  border-color: var(--marines-scarlet);
 }
 
 body.marines .hero.fullscreen .button:hover,
@@ -255,31 +325,65 @@ body.marines .hero.fullscreen .usa-button:hover {
   color: #000;
 }
 
-/* Desktop */
-@media (width >= 900px) {
-  body.marines .hero.fullscreen > div > div {
-    padding: 60px 32px;
+/* ==========================================================================
+   AIR FORCE THEME-SPECIFIC OVERRIDES
+   ========================================================================== */
+
+/* Air Force background color */
+body.airforce .hero.fullscreen {
+  background-color: var(--accent-color);
+}
+
+/* Air Force gradient overlay */
+body.airforce .hero.fullscreen > div > div::after {
+  background: linear-gradient(
+    to bottom,
+    rgb(28 35 71 / 60%) 0%,
+    rgb(28 35 71 / 30%) 30%,
+    rgb(28 35 71 / 40%) 70%,
+    rgb(28 35 71 / 70%) 100%
+  );
+}
+
+/* Air Force accent bar color */
+body.airforce .hero.fullscreen > div > div::before {
+  background-color: var(--accent-color-light);
+}
+
+/* Air Force heading font */
+body.airforce .hero.fullscreen h1 {
+  font-family: var(--heading-font-family);
+}
+
+/* Air Force button colors */
+body.airforce .hero.fullscreen .button,
+body.airforce .hero.fullscreen .usa-button {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+body.airforce .hero.fullscreen .button:hover,
+body.airforce .hero.fullscreen .usa-button:hover {
+  background-color: var(--accent-color-light);
+  border-color: var(--accent-color-light);
+  color: #fff;
+}
+
+/* Air Force hero content fade-in-up animation on page load */
+@keyframes hero-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
 
-  body.marines .hero.fullscreen > div > div::before {
-    width: 100px;
-    margin-bottom: 32px;
-  }
-
-  body.marines .hero.fullscreen h1 {
-    font-size: 48px;
-    letter-spacing: 3px;
-  }
-
-  body.marines .hero.fullscreen > div > div > p:not(:has(picture)) {
-    font-size: 18px;
-    max-width: 600px;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Large desktop */
-@media (width >= 1200px) {
-  body.marines .hero.fullscreen h1 {
-    font-size: 56px;
-  }
+body.airforce .hero.fullscreen > div > div::before,
+body.airforce .hero.fullscreen > div > div > h1 {
+  position: relative;
+  animation: hero-fade-in-up 0.5s ease-out 0.2s both;
 }
