@@ -1,8 +1,8 @@
 // add delayed functionality here
 
 /**
- * AOS (Animate on Scroll) Integration for Marines Theme
- * Only loads AOS library when the Marines theme is active
+ * AOS (Animate on Scroll) Integration
+ * Loads AOS library for supported themes: Marines, Air Force
  * https://michalsnik.github.io/aos/
  */
 
@@ -85,24 +85,23 @@ function decorateAOSElements() {
     }
   });
 
-  // Animate hero content
-  const heroContent = document.querySelector('.hero.fullscreen > div');
-  if (heroContent && !heroContent.hasAttribute('data-aos')) {
-    heroContent.setAttribute('data-aos', 'fade');
-    heroContent.setAttribute('data-aos-duration', '800');
-    heroContent.setAttribute('data-aos-delay', '300');
-    heroContent.setAttribute('data-aos-easing', 'ease-out-cubic');
-  }
+  // Note: Hero animation is handled via CSS keyframes in hero.css
+  // This ensures the animation triggers on page load, not on scroll
 }
 
 /**
- * Initializes AOS library for Marines theme
+ * Initializes AOS library for supported themes
  */
 async function initAOS() {
-  // Only load AOS for Marines theme
-  if (!document.body.classList.contains('marines')) {
+  // Only load AOS for supported themes
+  const isMarines = document.body.classList.contains('marines');
+  const isAirforce = document.body.classList.contains('airforce');
+
+  if (!isMarines && !isAirforce) {
     return;
   }
+
+  const themeName = isMarines ? 'Marines' : 'Air Force';
 
   try {
     // Load CSS and JS
@@ -138,7 +137,7 @@ async function initAOS() {
     });
 
     // eslint-disable-next-line no-console
-    console.log('[AOS] Initialized for Marines theme');
+    console.log(`[AOS] Initialized for ${themeName} theme`);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('[AOS] Failed to initialize:', error);
@@ -153,12 +152,16 @@ if (document.readyState === 'loading') {
 }
 
 /**
- * Marines Theme - Scroll handler for sticky header
+ * Scroll handler for sticky header
  * Adds 'scrolled' class to body when page is scrolled
  * This triggers the header background to become more opaque
+ * Supports: Marines, Air Force themes
  */
-function initMarinesScrollHandler() {
-  if (!document.body.classList.contains('marines')) {
+function initStickyHeaderScrollHandler() {
+  const isMarines = document.body.classList.contains('marines');
+  const isAirforce = document.body.classList.contains('airforce');
+
+  if (!isMarines && !isAirforce) {
     return;
   }
 
@@ -189,7 +192,7 @@ function initMarinesScrollHandler() {
 
 // Initialize scroll handler
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initMarinesScrollHandler);
+  document.addEventListener('DOMContentLoaded', initStickyHeaderScrollHandler);
 } else {
-  initMarinesScrollHandler();
+  initStickyHeaderScrollHandler();
 }
